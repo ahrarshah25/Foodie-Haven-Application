@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Foodie Haven</title>
+    <link rel="stylesheet" href="/Front-End/Admin Dashboard/admin.css">
+    <link rel="stylesheet" href="/Front-End/Notyf/notyf.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🍴</span>
+                    <span class="logo-text">Foodie Haven</span>
+                </div>
+                <button class="close-sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="user-profile">
+                <div class="profile-image">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="profile-info">
+                    <h3 id="adminName">Admin User</h3>
+                    <p>Super Administrator</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active">
+                    <i class="fas fa-users"></i>
+                    <span>User Management</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Product Management</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <button class="btn-logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <button class="hamburger">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search users..." id="searchInput">
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="theme-toggle">
+                        <input type="checkbox" id="theme-switch" class="theme-checkbox">
+                        <label for="theme-switch" class="theme-label">
+                            <i class="fas fa-sun"></i>
+                            <i class="fas fa-moon"></i>
+                            <span class="theme-ball"></span>
+                        </label>
+                    </div>
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="dashboard-content">
+                <div class="page-header">
+                    <h1>User Management</h1>
+                    <p>Manage and verify user accounts</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card verified-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="verifiedCount">0</h3>
+                            <p>Verified Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card unverified-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="unverifiedCount">0</h3>
+                            <p>Unverified Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card growth-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>+24%</h3>
+                            <p>Monthly Growth</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="management-card">
+                    <div class="card-header">
+                        <h2>User List</h2>
+                        <div class="card-actions">
+                            <div class="filter-dropdown">
+                                <select id="filterSelect">
+                                    <option value="all">All Users</option>
+                                    <option value="verified">Verified Only</option>
+                                    <option value="unverified">Unverified Only</option>
+                                </select>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <button class="btn-export">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users">
+                                <tr id="loadingSpinner">
+                                    <td colspan="4" class="loading-cell">
+                                        <div class="spinner"></div>
+                                        <span>Loading users...</span>
+                                    </td>
+                                </tr>
+                                <tr id="noUsersMessage" style="display: none;">
+                                    <td colspan="4" class="empty-cell">
+                                        <i class="fas fa-users-slash"></i>
+                                        <span>No users found</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</body>
+<script type="module" src="/Front-End/Admin Dashboard/admin.js"></script>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foodie Haven | Premium Food Store</title>
+  <link rel="stylesheet" href="/Front-End/Landing Page/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container">
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="#" class="logo">
+          <span class="logo-icon">🍴</span>
+          <span class="logo-text">Foodie Haven</span>
+        </a>
+
+        <div class="nav-menu">
+          <a href="#" class="nav-link">Home</a>
+          <a href="#" class="nav-link">About Us</a>
+          <a href="#" class="nav-link">Shop</a>
+          <a href="#" class="nav-link">Contact</a>
+        </div>
+
+        <div class="nav-actions">
+          <div class="theme-toggle">
+            <input type="checkbox" id="theme-switch" class="theme-checkbox" />
+            <label for="theme-switch" class="theme-label">
+              <i class="fas fa-sun"></i>
+              <i class="fas fa-moon"></i>
+              <span class="theme-ball"></span>
+            </label>
+          </div>
+
+          <button id="login" class="btn btn-login">Login</button>
+          <button id="signup" class="btn btn-primary btn-signup">Sign Up</button>
+
+          <button class="hamburger">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="mobile-sidebar">
+      <div class="sidebar-header">
+        <span class="logo">
+          <span class="logo-icon">🍴</span>
+          <span class="logo-text">Foodie Haven</span>
+        </span>
+        <button class="close-sidebar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="sidebar-menu">
+        <a href="#" class="sidebar-link">Home</a>
+        <a href="#" class="sidebar-link">About Us</a>
+        <a href="#" class="sidebar-link">Shop</a>
+        <a href="#" class="sidebar-link">Contact</a>
+        <div class="sidebar-actions">
+          <button class="btn btn-login sidebar-btn">Login</button>
+          <button class="btn btn-primary sidebar-btn">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            Savor the <span class="highlight">Finest</span> Flavors
+          </h1>
+          <p class="hero-subtitle">
+            Discover premium ingredients, artisanal products, and culinary
+            excellence delivered to your doorstep.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-large">
+              Explore Our Shop
+            </button>
+            <button class="btn btn-outline btn-large">Learn More</button>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="image-placeholder">
+            <div class="floating-item item-1">
+              <i class="fas fa-seedling"></i>
+            </div>
+            <div class="floating-item item-2">
+              <i class="fas fa-wine-bottle"></i>
+            </div>
+            <div class="floating-item item-3">
+              <i class="fas fa-cheese"></i>
+            </div>
+            <div class="image-frame">
+              <div class="image-content">
+                <i class="fas fa-utensils"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="section-header">
+          <h2>Why Choose Foodie Haven</h2>
+          <p>Experience the difference with our premium offerings</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <h3>Organic & Fresh</h3>
+            <p>
+              Carefully sourced organic ingredients from trusted local farms
+              and producers.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-shipping-fast"></i>
+            </div>
+            <h3>Fast Delivery</h3>
+            <p>
+              Same-day delivery for orders placed before 2 PM. Freshness
+              guaranteed.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-award"></i>
+            </div>
+            <h3>Premium Quality</h3>
+            <p>
+              Curated selection of gourmet products meeting the highest
+              standards.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-headset"></i>
+            </div>
+            <h3>Expert Support</h3>
+            <p>
+              Our culinary experts are available to guide your food journey.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="products">
+        <div class="section-header">
+          <h2>Featured Products</h2>
+          <p>Discover our curated selection of premium foods</p>
+        </div>
+        <div class="products-grid">
+          <div class="product-card">
+            <div class="product-image">
+              <i class="fas fa-wine-bottle"></i>
+            </div>
+            <div class="product-content">
+              <h3>Artisanal Olive Oil</h3>
+              <p>Cold-pressed extra virgin olive oil from Tuscan orchards.</p>
+              <div class="product-footer">
+                <span class="product-price">$24.99</span>
+                <button class="btn btn-small">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <i class="fas fa-cheese"></i>
+            </div>
+            <div class="product-content">
+              <h3>Aged Gouda Cheese</h3>
+              <p>24-month aged Dutch gouda with rich, caramel notes.</p>
+              <div class="product-footer">
+                <span class="product-price">$18.50</span>
+                <button class="btn btn-small">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <i class="fas fa-bread-slice"></i>
+            </div>
+            <div class="product-content">
+              <h3>Sourdough Bread</h3>
+              <p>Traditional slow-fermented sourdough baked daily.</p>
+              <div class="product-footer">
+                <span class="product-price">$8.99</span>
+                <button class="btn btn-small">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <i class="fas fa-coffee"></i>
+            </div>
+            <div class="product-content">
+              <h3>Specialty Coffee</h3>
+              <p>Single-origin beans from Ethiopian highlands.</p>
+              <div class="product-footer">
+                <span class="product-price">$16.75</span>
+                <button class="btn btn-small">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="cta-content">
+          <h2>Join Our Food Community</h2>
+          <p>
+            Subscribe to our newsletter for exclusive offers, recipes, and
+            culinary inspiration.
+          </p>
+          <div class="cta-form">
+            <input type="email" placeholder="Enter your email address" class="email-input" />
+            <button class="btn btn-primary">Subscribe</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="logo">
+            <span class="logo-icon">🍴</span>
+            <span class="logo-text">Foodie Haven</span>
+          </div>
+          <p>
+            Premium food experiences delivered with passion and excellence.
+          </p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <a href="#">Home</a>
+          <a href="#">About Us</a>
+          <a href="#">Shop</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-section">
+          <h4>Contact Info</h4>
+          <p><i class="fas fa-map-marker-alt"></i> 123 Gourmet Street</p>
+          <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+          <p><i class="fas fa-envelope"></i> info@foodiehaven.com</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 - <span id="currentYear" ></span> Foodie Haven. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+<script src="/Front-End/Landing Page/app.js"></script>
+
+</html>

@@ -1,0 +1,40 @@
+{
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/Front-End/Landing Page/index.html"
+        },
+        {
+            "source": "/about",
+            "destination": "/Front-End/About Page/about.html"
+        },
+        {
+            "source": "/contact",
+            "destination": "/Front-End/Contact Page/contact.html"
+        },
+        {
+            "source": "/signup",
+            "destination": "/Front-End/Signup Page/signup.html"
+        },
+        {
+            "source": "/login",
+            "destination": "/Front-End/Login Page/login.html"
+        },
+        {
+            "source": "/send-mail",
+            "destination": "/Front-End/Send Password Reset Mail/send-mail.html"
+        },
+        {
+            "source": "/forgot-password",
+            "destination": "/Front-End/Forgot Password/forgot-password.html"
+        },
+        {
+            "source": "/admin",
+            "destination": "/Front-End/Admin Dashboard/admin.html"
+        },
+        {
+            "source": "/account-type",
+            "destination": "/Front-End/Choose Account Type/acc-type.html"
+        }
+    ]
+}

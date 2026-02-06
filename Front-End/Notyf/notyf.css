@@ -1,0 +1,44 @@
+.notyf__toast {
+  background: #ffffff !important;
+  color: #fff !important;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.notyf__icon--success {
+  color: #22c55e !important;
+  font-size: 20px;
+}
+
+.notyf__icon--error {
+  color: #ef4444 !important;
+  font-size: 20px;
+}
+
+.notyf__message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notyf-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.notyf-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}

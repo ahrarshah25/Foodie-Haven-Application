@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forgot Password | Foodie Haven</title>
+    <link
+      rel="stylesheet"
+      href="/Front-End/Send Password Reset Mail/send-mail.css"
+    />
+    <link rel="stylesheet" href="/Front-End/Notyf/notyf.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="forgot-container">
+      <div class="forgot-background">
+        <div class="background-pattern"></div>
+        <div class="floating-element element-1">
+          <i class="fas fa-key"></i>
+        </div>
+        <div class="floating-element element-2">
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div class="floating-element element-3">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="background-overlay"></div>
+      </div>
+
+      <div class="forgot-content">
+        <div class="forgot-header">
+          <a href="/" class="back-home">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+          </a>
+          <div class="forgot-logo">
+            <span class="logo-icon">🔐</span>
+            <span class="logo-text">Foodie Haven</span>
+          </div>
+        </div>
+
+        <div class="forgot-card">
+          <div class="forgot-card-header">
+            <h1>Reset Your Password</h1>
+            <p>Enter your email address to receive a password reset link</p>
+          </div>
+
+          <form class="forgot-form">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="you@example.com"
+                  
+                />
+              </div>
+              <div class="email-helper">
+                <i class="fas fa-info-circle"></i>
+                We'll send reset instructions to this email
+              </div>
+            </div>
+
+            <button id="submitBtn" type="submit" class="btn-forgot-submit">
+              <span>Send Reset Link</span>
+              <i class="fas fa-paper-plane"></i>
+            </button>
+
+            <div class="security-notice">
+              <div class="notice-icon">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="notice-content">
+                <h3>Secure Password Reset</h3>
+                <p>
+                  Your password reset link will expire in 1 hour for security
+                  reasons
+                </p>
+              </div>
+            </div>
+
+            <div class="divider">
+              <span>Need help?</span>
+            </div>
+
+            <div class="support-options">
+              <a href="/contact" class="support-link">
+                <i class="fas fa-headset"></i>
+                Contact Support
+              </a>
+              <a href="/help" class="support-link">
+                <i class="fas fa-question-circle"></i>
+                Help Center
+              </a>
+            </div>
+
+            <div class="forgot-footer">
+              <p>
+                Remember your password?
+                <a href="/login" class="login-link">Sign in instead</a>
+              </p>
+              <p>
+                New to Foodie Haven?
+                <a href="/signup" class="signup-link">Create an account</a>
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <div class="forgot-features">
+          <div class="feature">
+            <i class="fas fa-bolt"></i>
+            <h3>Instant Delivery</h3>
+            <p>Reset links arrive within seconds</p>
+          </div>
+          <div class="feature">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Secure Process</h3>
+            <p>256-bit encryption protects your data</p>
+          </div>
+          <div class="feature">
+            <i class="fas fa-clock"></i>
+            <h3>24/7 Support</h3>
+            <p>Our team is always ready to help</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="module" src="/Front-End/Send Password Reset Mail/send-mail.js"></script>
+</html>

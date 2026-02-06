@@ -1,0 +1,307 @@
+import {
+  auth,
+  db,
+  googleProvider,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  updateProfile,
+  serverTimestamp,
+  githubProvider
+} from "../Firebase/config.js";
+
+import notyf from "../Notyf/notyf.js";
+import emailHandler from "../helpers/emailHandler.js";
+import passwordHandler from "../helpers/passwordHanler.js";
+import showLoading from "../Notyf/loader.js";
+import approveRequest from "../api/Signup-Email/approveRequest.api.js";
+import checkUser from "../utils/checkUser.js";
+
+document.addEventListener('DOMContentLoaded', () => {
+  checkUser();
+})
+
+const togglePassword = document.getElementById("togglePassword");
+togglePassword.addEventListener("click", function () {
+  const passwordInput = document.getElementById("password");
+  const icon = this.querySelector("i");
+
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    icon.classList.remove("fa-eye");
+    icon.classList.add("fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    icon.classList.remove("fa-eye-slash");
+    icon.classList.add("fa-eye");
+  }
+});
+
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+toggleConfirmPassword.addEventListener("click", function () {
+  const confirmInput = document.getElementById("confirmPassword");
+  const icon = this.querySelector("i");
+
+  if (confirmInput.type === "password") {
+    confirmInput.type = "text";
+    icon.classList.remove("fa-eye");
+    icon.classList.add("fa-eye-slash");
+  } else {
+    confirmInput.type = "password";
+    icon.classList.remove("fa-eye-slash");
+    icon.classList.add("fa-eye");
+  }
+});
+
+const userSignup = async () => {
+  let firstName = document.getElementById("firstName");
+  let lastName = document.getElementById("lastName");
+  let email = document.getElementById("email");
+  let password = document.getElementById("password");
+  let confirmPassword = document.getElementById("confirmPassword");
+
+  if (
+    !firstName.value.trim() ||
+    !email.value.trim() ||
+    !password.value.trim() ||
+    !confirmPassword.value.trim()
+  ) {
+    notyf.error("Empty Inputs!");
+
+    firstName.value = "";
+    lastName.value = "";
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+
+    return;
+  }
+
+  if (!emailHandler(email.value)) {
+    notyf.error(
+      "Please Enter Correct Email With Correct Syntax\nFor Examle: name@domain.com.",
+    );
+
+    firstName.value = "";
+    lastName.value = "";
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+
+    return;
+  }
+
+  if (!passwordHandler(password.value)) {
+    notyf.error("Password Should Match With Requirements.");
+
+    firstName.value = "";
+    lastName.value = "";
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+
+    return;
+  }
+
+  if (password.value !== confirmPassword.value) {
+    notyf.error("Please Enter Same Password In Confirm Password Section.");
+
+    firstName.value = "";
+    lastName.value = "";
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+
+    return;
+  }
+
+  const fullName = firstName.value + " " + lastName.value || "" ;
+  const role = localStorage.getItem("role");
+
+  try {
+    var loading = showLoading(notyf, "Creating Account...");
+    const user = await createUserWithEmailAndPassword(
+      auth,
+      email.value,
+      password.value,
+    );
+
+    await setDoc(doc(db, "users", user.user.uid), {
+      userName: fullName,
+      userEmail: email.value,
+      isVerified: false,
+      userRole: role || "user",
+      createdAt: serverTimestamp(),
+    });
+
+    await updateProfile(user.user, {
+      displayName: fullName,
+    });
+
+    if(role === "vendor") {
+      const res = await approveRequest(email.value, fullName);
+
+    if(res.data.success === false){
+      // console.log(res);
+      return;
+    }
+    }
+
+    if (role === "user") {
+      await updateDoc(doc(db, "users", user.user.uid), {
+        isVerified: true,
+      });
+      notyf.dismiss(loading);
+      notyf.success("Account Created Successfully!");
+      setTimeout(() => {
+      window.location.href = "/login";
+      },1500)
+    } else {
+      notyf.dismiss(loading);
+
+      notyf.success("Account Created Successfully!\nWait For Admin Approval.");
+      setTimeout(() => {
+      window.location.href = "/login";
+      },1500)
+    }
+  } catch (error) {
+    notyf.dismiss(loading);
+    notyf.error(error.message);
+
+    firstName.value = "";
+    lastName.value = "";
+    email.value = "";
+    password.value = "";
+    confirmPassword.value = "";
+  }
+};
+
+const googleLogin = async () => {
+  try {
+    const role = localStorage.getItem("role")
+    var loading = showLoading(notyf, "Creating Account...");
+
+    const response = await signInWithPopup(auth, googleProvider);
+    const userRef = doc(db, "users", response.user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()) {
+      setDoc(userRef, {
+        userName: response.user.displayName,
+        userEmail: response.user.email,
+        isVerified: false,
+        userRole: role || "user",
+        createdAt: serverTimestamp(),
+      });  
+    }
+
+    if(role === "vendor") {
+      const res = await approveRequest(email.value, fullName);
+
+    if(res.data.success === false){
+      // console.log(res);
+      return;
+    }
+    }
+    
+
+    if (role === "user") {
+      notyf.dismiss(loading);
+      notyf.success("Account Created Successfully!");
+      setTimeout(() => {
+      window.location.href = "/login";
+      },1500)
+    } else {
+      notyf.dismiss(loading);
+
+      notyf.success("Account Created Successfully!\nWait For Admin Approval.");
+      setTimeout(() => {
+      window.location.href = "/login";
+      },1500)
+    }
+  } catch (error) {
+    notyf.dismiss(loading);
+    notyf.error(error.message);
+  }
+};
+
+const githubLogin = async () => {
+  try {
+    const role = localStorage.getItem("role")
+    var loading = showLoading(notyf, "Creating Account...");
+
+    const response = await signInWithPopup(auth, githubProvider);
+    const userRef = doc(db, "users", response.user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()) {
+      setDoc(userRef, {
+        userName: response.user.displayName,
+        userEmail: response.user.email,
+        isVerified: false,
+        userRole: role || "user",
+        createdAt: serverTimestamp(),
+      });
+     
+    }
+
+    if(role === "vendor") {
+      const res = await approveRequest(email.value, fullName);
+
+    if(res.data.success === false){
+      // console.log(res);
+      return;
+    }
+    }
+
+    if (role === "user") {
+      notyf.dismiss(loading);
+      notyf.success("Account Created Successfully!");
+      setTimeout(() => {
+      window.location.href = "/login";
+      },1500)
+    } else {
+      notyf.dismiss(loading);
+
+      notyf.success("Account Created Successfully!\nWait For Admin Approval.");
+      setTimeout(() => {
+      window.location.href = "/login";
+      },1500)
+    }
+  } catch (error) {
+    notyf.dismiss(loading);
+    notyf.error(error.message);
+  }
+}
+
+const submitBtn = document.getElementById("submitBtn");
+
+submitBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const key = e.keyCode || e.which;
+
+  if (key === 13) {
+    userSignup();
+    return;
+  }
+
+  userSignup();
+});
+
+const googleBtn = document.getElementById("googleBtn");
+
+googleBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  googleLogin();
+});
+
+const githubBtn = document.getElementById("githubBtn");
+
+githubBtn.addEventListener('click' , (e) => {
+  e.preventDefault();
+  githubLogin();
+});

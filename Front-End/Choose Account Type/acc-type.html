@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foodie Haven | Choose Login Type</title>
+    <link rel="stylesheet" href="/Front-End/Choose Account Type/acc-type.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container-box">
+      <div class="type-header">
+        <div class="type-logo">
+          <span class="logo-icon">🍴</span>
+          <span class="logo-text">Foodie Haven</span>
+        </div>
+        <p class="type-subtitle">
+          Choose how you want to experience Foodie Haven
+        </p>
+      </div>
+
+      <div class="login-options">
+        <div
+          class="login-box"
+          onclick="window.location.href = '/signup'; localStorage.setItem('role', 'user')"
+        >
+          <div class="icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <h3>Login As Food Lover</h3>
+          <p>
+            Explore delicious food, place orders, and enjoy culinary delights
+            from top vendors.
+          </p>
+          <div class="features">
+            <span><i class="fas fa-check"></i> Browse food items</span>
+            <span><i class="fas fa-check"></i> Place orders</span>
+            <span><i class="fas fa-check"></i> Track deliveries</span>
+          </div>
+        </div>
+
+        <div
+          class="login-box"
+          onclick="window.location.href = '/signup'; localStorage.setItem('role', 'vendor')"
+        >
+          <div class="icon">
+            <i class="fas fa-store"></i>
+          </div>
+          <h3>Login As Vendor</h3>
+          <p>
+            Manage your shop, upload products, and grow your food business with
+            us.
+          </p>
+          <div class="features">
+            <span><i class="fas fa-check"></i> Manage shop</span>
+            <span><i class="fas fa-check"></i> Upload products</span>
+            <span><i class="fas fa-check"></i> View orders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="type-footer">
+        <p>
+          New to Foodie Haven?
+          <a href="/signup" class="signup-link">Create an account</a>
+        </p>
+        <p>
+          Need help? <a href="/contact" class="help-link">Contact Support</a>
+        </p>
+      </div>
+    </div>
+  </body>
+  <script src="/Front-End/Choose Account Type/acc-type.js"></script>
+</html>
