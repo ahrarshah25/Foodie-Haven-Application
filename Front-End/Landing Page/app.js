@@ -1,4 +1,4 @@
-console.log("Landing Page");
+import { auth, db, getDoc, doc, signOut, onAuthStateChanged } from "../Firebase/config.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const themeSwitch = document.getElementById("theme-switch");
@@ -107,13 +107,42 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+
 const loginBtn = document.getElementById("login");
 const signupBtn = document.getElementById("signup");
 
-loginBtn.addEventListener("click", function () {
-  window.location.href = "/login";
-});
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    const data = snap.data();
 
-signupBtn.addEventListener("click", function () {
-  window.location.href = "/signup";
+    signupBtn.textContent = "Logout";
+    signupBtn.onclick = async () => {
+      await signOut(auth);
+    };
+
+    if (data.userRole === "vendor") {
+      loginBtn.textContent = "Dashboard";
+      loginBtn.onclick = () => window.location.href = "/vendor";
+      return;
+    }
+
+    if (data.userRole === "user") {
+      loginBtn.textContent = "Dashboard";
+      loginBtn.onclick = () => window.location.href = "/dashboard";
+      return;
+    }
+
+    if (data.userRole === "admin") {
+      loginBtn.textContent = "Admin Panel";
+      loginBtn.onclick = () => window.location.href = "/admin";
+      return;
+    }
+  }
+
+  loginBtn.textContent = "Login";
+  signupBtn.textContent = "Signup";
+
+  loginBtn.onclick = () => window.location.href = "/account-type";
+  signupBtn.onclick = () => window.location.href = "/account-type";
 });
