@@ -17,7 +17,7 @@ import notyf from "../Notyf/notyf.js";
 import emailHandler from "../helpers/emailHandler.js";
 import passwordHandler from "../helpers/passwordHanler.js";
 import showLoading from "../Notyf/loader.js";
-import approveRequest from "../api/Signup-Email/approveRequest.api.js";
+import approveSignup from "../api/Signup-Email/approveRequest.api.js";
 import checkUser from "../utils/checkUser.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -142,10 +142,11 @@ const userSignup = async () => {
     });
 
     if(role === "vendor") {
-      const res = await approveRequest(email.value, fullName);
+      const res = await approveSignup(email.value, fullName);
 
     if(res.data.success === false){
-      // console.log(res);
+      notyf.dismiss(loading);
+      notyf.error("Faild To Send Approve Request.");
       return;
     }
     }
@@ -199,16 +200,20 @@ const googleLogin = async () => {
     }
 
     if(role === "vendor") {
-      const res = await approveRequest(email.value, fullName);
+      const res = await approveSignup(response.user.email, response.user.displayName);
 
     if(res.data.success === false){
-      // console.log(res);
+      notyf.dismiss(loading);
+      notyf.error("Faild To Send Approve Request.");
       return;
     }
     }
     
 
     if (role === "user") {
+      await updateDoc(doc(db, "users", user.user.uid), {
+        isVerified: true,
+      });
       notyf.dismiss(loading);
       notyf.success("Account Created Successfully!");
       setTimeout(() => {
@@ -249,15 +254,19 @@ const githubLogin = async () => {
     }
 
     if(role === "vendor") {
-      const res = await approveRequest(email.value, fullName);
+      const res = await approveSignup(response.user.email, response.user.displayName);
 
     if(res.data.success === false){
-      // console.log(res);
+      notyf.dismiss(loading);
+      notyf.error("Faild To Send Approve Request.");
       return;
     }
     }
 
     if (role === "user") {
+      await updateDoc(doc(db, "users", user.user.uid), {
+        isVerified: true,
+      }); 
       notyf.dismiss(loading);
       notyf.success("Account Created Successfully!");
       setTimeout(() => {

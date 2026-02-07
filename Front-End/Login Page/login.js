@@ -16,6 +16,7 @@ import showLoading from "../Notyf/loader.js";
 import handleRedirect from "../handlers/handleRedirect.js";
 import notyf from "../Notyf/notyf.js";
 import checkUser from "../utils/checkUser.js";
+import approveRequest from "../api/Signup-Email/approveRequest.api.js"
 
 document.addEventListener('DOMContentLoaded', () => {
   checkUser();
@@ -90,7 +91,7 @@ const userLogin = async () => {
 const googleLogin = async () => {
   try {
     const role = localStorage.getItem("role");
-    var loading = showLoading(notyf, "Creating Account...");
+    var loading = showLoading(notyf, "Processing...");
 
     const response = await signInWithPopup(auth, googleProvider);
     const userRef = doc(db, "users", response.user.uid);
@@ -108,7 +109,7 @@ const googleLogin = async () => {
     }
 
     if(role === "vendor") {
-      const res = await approveRequest(email.value, fullName);
+      const res = await approveRequest(response.user.email, response.user.displayName);
 
     if(res.data.success === false){
       // console.log(res);
@@ -129,7 +130,7 @@ const googleLogin = async () => {
 const githubLogin = async () => {
   try {
     const role = localStorage.getItem("role");
-    var loading = showLoading(notyf, "Creating Account...");
+    var loading = showLoading(notyf, "Processing...");
 
     const response = await signInWithPopup(auth, githubProvider);
     const userRef = doc(db, "users", response.user.uid);
@@ -146,7 +147,7 @@ const githubLogin = async () => {
     }
 
     if(role === "vendor") {
-      const res = await approveRequest(email.value, fullName);
+      const res = await approveRequest(response.user.email, response.user.displayName);
 
     if(res.data.success === false){
       // console.log(res);
