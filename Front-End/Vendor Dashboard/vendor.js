@@ -123,22 +123,23 @@ async function loadDashboardData() {
   const dashboardContent = document.getElementById("dashboardContent");
 
   try {
+    // Fix: orders query - each order has shopIds array, need to check if shopId is in that array
+    const ordersQuery = query(
+      collection(db, "orders"),
+      where("shopIds", "array-contains", shopId),
+      orderBy("createdAt", "desc"),
+      limit(50),
+    );
+
+    const productsQuery = query(
+      collection(db, "items"),
+      where("shopId", "==", shopId),
+      orderBy("createdAt", "desc"),
+    );
+
     const [ordersSnapshot, productsSnapshot, categories] = await Promise.all([
-      getDocs(
-        query(
-          collection(db, "orders"),
-          where("shopId", "==", shopId),
-          orderBy("createdAt", "desc"),
-          limit(50),
-        ),
-      ),
-      getDocs(
-        query(
-          collection(db, "items"),
-          where("shopId", "==", shopId),
-          orderBy("createdAt", "desc"),
-        ),
-      ),
+      getDocs(ordersQuery),
+      getDocs(productsQuery),
       getShopCategories(),
     ]);
 
@@ -164,17 +165,15 @@ async function loadDashboardData() {
       products.push({ id: doc.id, ...doc.data() });
     });
 
-    renderDashboardView(orders, products, categories);
+    updateStats(
+      totalRevenue,
+      orders.length,
+      pendingCount,
+      completedCount,
+      products.length,
+    );
 
-updateStats(
-  totalRevenue,
-  orders.length,
-  pendingCount,
-  completedCount,
-  products.length
-);
-
-updatePendingBadges(pendingCount);
+    updatePendingBadges(pendingCount);
 
     renderDashboardView(orders, products, categories);
   } catch (error) {
@@ -185,13 +184,21 @@ updatePendingBadges(pendingCount);
 
 function updateStats(revenue, totalOrders, pending, completed, totalProducts) {
   const totalRevenueEl = document.getElementById("totalRevenue");
-  if (!totalRevenueEl) return; // 🔐 safety
+  if (totalRevenueEl) {
+    totalRevenueEl.textContent = `PKR ${revenue.toLocaleString()}`;
+  }
 
-  totalRevenueEl.textContent = `PKR ${revenue.toLocaleString()}`;
-  document.getElementById("totalOrders").textContent = totalOrders;
-  document.getElementById("pendingOrders").textContent = pending;
-  document.getElementById("completedOrders").textContent = completed;
-  document.getElementById("totalProducts").textContent = totalProducts;
+  const totalOrdersEl = document.getElementById("totalOrders");
+  if (totalOrdersEl) totalOrdersEl.textContent = totalOrders;
+
+  const pendingOrdersEl = document.getElementById("pendingOrders");
+  if (pendingOrdersEl) pendingOrdersEl.textContent = pending;
+
+  const completedOrdersEl = document.getElementById("completedOrders");
+  if (completedOrdersEl) completedOrdersEl.textContent = completed;
+
+  const totalProductsEl = document.getElementById("totalProducts");
+  if (totalProductsEl) totalProductsEl.textContent = totalProducts;
 
   const badge = document.getElementById("pendingOrdersNavBadge");
   if (badge) {
@@ -200,11 +207,12 @@ function updateStats(revenue, totalOrders, pending, completed, totalProducts) {
   }
 }
 
-
 function updatePendingBadges(count) {
   const badge = document.getElementById("pendingOrdersNavBadge");
-  badge.textContent = count;
-  badge.style.display = count > 0 ? "inline" : "none";
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? "inline" : "none";
+  }
 }
 
 function renderDashboardView(orders, products, categories) {
@@ -223,6 +231,8 @@ function renderDashboardView(orders, products, categories) {
     .sort((a, b) => b.orderCount - a.orderCount)
     .slice(0, 5);
 
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+
   dashboardContent.innerHTML = `
         <div class="welcome-section">
             <h1>Welcome back, <span>${currentShop?.shopName || "Vendor"}</span> 👋</h1>
@@ -235,7 +245,7 @@ function renderDashboardView(orders, products, categories) {
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="totalRevenue">PKR ${orders.reduce((sum, o) => sum + (o.total || 0), 0).toLocaleString()}</h3>
+                    <h3 id="totalRevenue">PKR ${totalRevenue.toLocaleString()}</h3>
                     <p>Total Revenue</p>
                 </div>
                 <div class="stat-trend up">
@@ -249,7 +259,7 @@ function renderDashboardView(orders, products, categories) {
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>${orders.length}</h3>
+                    <h3 id="totalOrders">${orders.length}</h3>
                     <p>Total Orders</p>
                 </div>
                 <div class="stat-trend up">
@@ -263,7 +273,7 @@ function renderDashboardView(orders, products, categories) {
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>${pendingOrders.length}</h3>
+                    <h3 id="pendingOrders">${pendingOrders.length}</h3>
                     <p>Pending Orders</p>
                 </div>
                 <div class="stat-trend">
@@ -277,7 +287,7 @@ function renderDashboardView(orders, products, categories) {
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>${orders.filter((o) => o.status === "completed").length}</h3>
+                    <h3 id="completedOrders">${orders.filter((o) => o.status === "completed").length}</h3>
                     <p>Completed</p>
                 </div>
                 <div class="stat-trend up">
@@ -291,7 +301,7 @@ function renderDashboardView(orders, products, categories) {
                     <i class="fas fa-box"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>${products.length}</h3>
+                    <h3 id="totalProducts">${products.length}</h3>
                     <p>Products</p>
                 </div>
                 <a href="upload" class="stat-action">
@@ -393,7 +403,7 @@ function renderDashboardView(orders, products, categories) {
 
 function renderOrdersTable(orders) {
   if (orders.length === 0) {
-    return `<tr><td colspan="9" class="empty-state">No orders found</td></tr>`;
+    return `<tr><td colspan="9" class="empty-cell">No orders found</td></tr>`;
   }
 
   return orders
@@ -419,7 +429,7 @@ function renderOrdersTable(orders) {
             <td>
                 <span class="payment-method">
                     <i class="fas fa-${order.paymentMethod === "jazzcash" ? "mobile-alt" : order.paymentMethod === "easypaisa" ? "mobile-alt" : "credit-card"}"></i> 
-                    ${order.paymentMethod || "JazzCash"}
+                    ${order.paymentMethod ? order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1) : "Card"}
                 </span>
             </td>
             <td>
@@ -483,8 +493,8 @@ function renderTopProducts(products) {
         <div class="product-item">
             <div class="product-image">
                 ${
-                  product.imageUrl
-                    ? `<img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`
+                  product.images && product.images[0]
+                    ? `<img src="${product.images[0]}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`
                     : `<i class="fas fa-${getProductIcon(product.category)}"></i>`
                 }
             </div>
@@ -511,6 +521,12 @@ function getProductIcon(category) {
     BBQ: "fire",
     Seafood: "fish",
     Vegetarian: "carrot",
+    "Fast Food": "hamburger",
+    Biryani: "rice",
+    Bread: "bread-slice",
+    Pasta: "wheat-alt",
+    Salad: "salad",
+    Breakfast: "egg",
   };
   return icons[category] || "utensils";
 }
@@ -527,17 +543,19 @@ async function loadOrdersView(filter = "all") {
     `;
 
   try {
-    let ordersQuery = query(
-      collection(db, "orders"),
-      where("shopId", "==", shopId),
-      orderBy("createdAt", "desc"),
-    );
+    let ordersQuery;
 
     if (filter !== "all") {
       ordersQuery = query(
         collection(db, "orders"),
-        where("shopId", "==", shopId),
+        where("shopIds", "array-contains", shopId),
         where("status", "==", filter),
+        orderBy("createdAt", "desc"),
+      );
+    } else {
+      ordersQuery = query(
+        collection(db, "orders"),
+        where("shopIds", "array-contains", shopId),
         orderBy("createdAt", "desc"),
       );
     }
@@ -631,39 +649,39 @@ async function loadProductsView() {
     });
 
     dashboardContent.innerHTML = `
-            <div class="card-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div>
-                    <h2>My Products</h2>
-                    <p>${products.length} products in your inventory</p>
+                    <h2 style="font-size: 1.8rem; font-weight: 700;">My Products</h2>
+                    <p style="color: var(--text-light);">${products.length} products in your inventory</p>
                 </div>
-                <a href="upload" class="btn-primary" style="padding: 12px 24px; text-decoration: none;">
+                <a href="upload" style="background: var(--primary-yellow); color: var(--text-dark); padding: 12px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: var(--transition);">
                     <i class="fas fa-plus"></i> Add New Product
                 </a>
             </div>
             
-            <div class="products-grid">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
                 ${products
                   .map(
                     (product) => `
-                    <div class="product-card">
-                        <div class="product-card-image">
+                    <div style="background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--medium-gray); transition: var(--transition);">
+                        <div style="height: 200px; background: var(--light-gray); display: flex; align-items: center; justify-content: center;">
                             ${
-                              product.imageUrl
-                                ? `<img src="${product.imageUrl}" alt="${product.name}">`
-                                : `<i class="fas fa-${getProductIcon(product.category)}"></i>`
+                              product.images && product.images[0]
+                                ? `<img src="${product.images[0]}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                                : `<i class="fas fa-${getProductIcon(product.category)}" style="font-size: 3rem; color: var(--medium-gray);"></i>`
                             }
                         </div>
-                        <div class="product-card-content">
-                            <h3>${product.name}</h3>
-                            <p>${product.description || "No description"}</p>
-                            <div class="product-card-footer">
-                                <span class="product-price">PKR ${(product.price || 0).toLocaleString()}</span>
-                                <div class="product-actions">
-                                    <button class="edit" onclick="window.editProduct('${product.id}')" title="Edit Product">
-                                        <i class="fas fa-edit"></i>
+                        <div style="padding: 1.5rem;">
+                            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">${product.name}</h3>
+                            <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">${product.description?.substring(0, 60) || "No description"}</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 1.3rem; font-weight: 700; color: var(--primary-yellow);">PKR ${(product.price || 0).toLocaleString()}</span>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="window.editProduct('${product.id}')" style="background: var(--light-gray); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition);" title="Edit Product">
+                                        <i class="fas fa-edit" style="color: var(--text-dark);"></i>
                                     </button>
-                                    <button class="delete" onclick="window.deleteProduct('${product.id}')" title="Delete Product">
-                                        <i class="fas fa-trash"></i>
+                                    <button onclick="window.deleteProduct('${product.id}')" style="background: var(--light-gray); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition);" title="Delete Product">
+                                        <i class="fas fa-trash" style="color: var(--error-red);"></i>
                                     </button>
                                 </div>
                             </div>
@@ -684,7 +702,7 @@ async function loadProductsView() {
                     <i class="fas fa-box-open"></i>
                     <h3>No products yet</h3>
                     <p>Start adding products to your shop</p>
-                    <a href="upload" class="btn-primary" style="margin-top: 16px; display: inline-block; padding: 12px 24px; text-decoration: none;">
+                    <a href="upload" style="background: var(--primary-yellow); color: var(--text-dark); padding: 12px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 16px;">
                         Add Your First Product
                     </a>
                 </div>
@@ -707,30 +725,28 @@ async function loadCategoriesView() {
     const categories = await getShopCategories();
 
     dashboardContent.innerHTML = `
-            <div class="card-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div>
-                    <h2>Product Categories</h2>
-                    <p>Manage your product categories</p>
+                    <h2 style="font-size: 1.8rem; font-weight: 700;">Product Categories</h2>
+                    <p style="color: var(--text-light);">Manage your product categories</p>
                 </div>
-                <button class="btn-primary" id="showAddCategoryModal" style="padding: 12px 24px;">
+                <button style="background: var(--primary-yellow); color: var(--text-dark); padding: 12px 24px; border: none; border-radius: 50px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition);" id="showAddCategoryModal">
                     <i class="fas fa-plus"></i> Add Category
                 </button>
             </div>
             
-            <div class="categories-grid">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
                 ${categories
                   .map(
                     (category) => `
-                    <div class="category-item">
-                        <div class="category-info">
-                            <i class="fas fa-${getCategoryIcon(category)}"></i>
-                            <h4>${category}</h4>
+                    <div style="background: var(--white); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--medium-gray); display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-${getCategoryIcon(category)}" style="color: var(--primary-yellow); font-size: 1.5rem;"></i>
+                            <h4 style="font-weight: 600;">${category}</h4>
                         </div>
-                        <div class="category-actions">
-                            <button onclick="window.deleteCategory('${category}')" title="Delete Category">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                        <button onclick="window.deleteCategory('${category}')" style="background: none; border: none; cursor: pointer; color: var(--text-light); transition: var(--transition);" title="Delete Category">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 `,
                   )
@@ -744,7 +760,7 @@ async function loadCategoriesView() {
                     <i class="fas fa-tags"></i>
                     <h3>No categories yet</h3>
                     <p>Create categories to organize your products</p>
-                    <button class="btn-primary" id="showAddCategoryModalEmpty" style="margin-top: 16px;">
+                    <button style="background: var(--primary-yellow); color: var(--text-dark); padding: 12px 24px; border: none; border-radius: 50px; font-weight: 600; margin-top: 16px; cursor: pointer;" id="showAddCategoryModalEmpty">
                         Create First Category
                     </button>
                 </div>
@@ -937,7 +953,7 @@ function setupRealtimeListeners() {
 
   const ordersQuery = query(
     collection(db, "orders"),
-    where("shopId", "==", shopId),
+    where("shopIds", "array-contains", shopId),
     where("status", "==", "pending"),
     orderBy("createdAt", "desc"),
     limit(10),
@@ -975,13 +991,17 @@ window.viewOrderDetails = async (orderId) => {
     const modal = document.getElementById("orderModal");
     const modalBody = document.getElementById("orderModalBody");
 
+    // Filter items for this shop
+    const shopItems =
+      order.items?.filter((item) => item.shopId === shopId) || [];
+
     let itemsHtml = "";
-    if (order.items && order.items.length > 0) {
+    if (shopItems.length > 0) {
       itemsHtml = `
                 <div style="margin: 20px 0;">
-                    <h4 style="margin-bottom: 12px;">Order Items</h4>
+                    <h4 style="margin-bottom: 12px;">Order Items from Your Shop</h4>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
-                        ${order.items
+                        ${shopItems
                           .map(
                             (item) => `
                             <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--light-gray); border-radius: 8px;">
@@ -1016,6 +1036,7 @@ window.viewOrderDetails = async (orderId) => {
                     <div>
                         <strong>Shipping Address</strong>
                         <p style="margin-top: 8px;">${order.shippingAddress || "No address provided"}</p>
+                        <p style="margin-top: 8px;"><strong>Delivery Time:</strong> ${order.deliveryTime || "ASAP"}</p>
                     </div>
                 </div>
                 
@@ -1023,12 +1044,8 @@ window.viewOrderDetails = async (orderId) => {
                 
                 <div style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: var(--light-gray); border-radius: 12px;">
                     <div style="display: flex; justify-content: space-between;">
-                        <span>Subtotal:</span>
-                        <span>PKR ${((order.total || 0) - (order.deliveryFee || 0)).toLocaleString()}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Delivery Fee:</span>
-                        <span>PKR ${(order.deliveryFee || 0).toLocaleString()}</span>
+                        <span>Subtotal (Your Items):</span>
+                        <span>PKR ${shopItems.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0).toLocaleString()}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-weight: 700; color: var(--success);">
                         <span>Total:</span>

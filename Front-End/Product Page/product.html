@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Details | Foodie Haven</title>
+    <link rel="stylesheet" href="/Front-End/Product Page/product.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
+  </head>
+  <body>
+    <div class="product-container">
+      <div class="product-header">
+        <nav class="product-nav">
+          <div class="nav-left">
+            <a href="/" class="logo">
+              <span class="logo-icon">🍴</span>
+              <span class="logo-text">Foodie Haven</span>
+            </a>
+          </div>
+          <div class="nav-right">
+            <a href="/shop" class="browse-link">
+              <i class="fas fa-store"></i>
+              Browse All Products
+            </a>
+            <div class="cart-icon" id="cartIcon">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="cart-count" id="cartCount">0</span>
+            </div>
+            <div class="user-menu" id="userMenu">
+              <i class="fas fa-user-circle"></i>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <div class="product-main">
+        <div class="product-detail-container" id="productDetailContainer">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading product details...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+          <h3>Your Cart</h3>
+          <button class="close-cart" id="closeCart">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="cart-items" id="cartItems">
+          <div class="empty-cart">
+            <i class="fas fa-shopping-basket"></i>
+            <p>Your cart is empty</p>
+            <p class="empty-sub">Add items to get started</p>
+          </div>
+        </div>
+        <div class="cart-footer">
+          <div class="cart-total">
+            <span>Total:</span>
+            <span class="total-amount" id="cartTotal">PKR 0</span>
+          </div>
+          <button class="checkout-btn" id="checkoutBtn">
+            Proceed to Checkout
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script type="module" src="/Front-End/Product Page/product.js"></script>
+  </body>
+</html>

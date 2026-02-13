@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop Settings | Foodie Haven</title>
+    <link
+      rel="stylesheet"
+      href="/Front-End/Vendor Dashboard/shop-setting.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
+  </head>
+  <body>
+    <div class="shop-settings-container">
+      <div class="settings-header">
+        <a href="/vendor" class="back-btn">
+          <i class="fas fa-arrow-left"></i>
+          Back to Dashboard
+        </a>
+        <div class="header-logo">
+          <span class="logo-icon">🏪</span>
+          <span class="logo-text">Foodie Haven</span>
+        </div>
+        <h1>Shop Settings</h1>
+        <p>Customize your storefront and manage your business profile</p>
+      </div>
+
+      <div class="settings-grid">
+        <div class="settings-sidebar">
+          <div class="shop-preview-card">
+            <div class="shop-avatar" id="shopAvatar">
+              <img
+                id="avatarPreview"
+                src=""
+                alt="Shop Avatar"
+                style="display: none"
+              />
+              <i class="fas fa-store" id="avatarIcon"></i>
+              <button class="change-avatar-btn" id="changeAvatarBtn">
+                <i class="fas fa-camera"></i>
+              </button>
+              <input type="file" id="avatarInput" accept="image/*" hidden />
+            </div>
+            <h3 id="previewShopName">Your Shop Name</h3>
+            <div class="shop-category" id="previewCategory">Food Category</div>
+            <div class="shop-rating">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+              <span id="previewRating">4.8 (128 reviews)</span>
+            </div>
+            <div class="shop-status-badge" id="shopStatusBadge">
+              <i class="fas fa-clock"></i>
+              Pending Approval
+            </div>
+          </div>
+
+          <nav class="settings-nav">
+            <a href="#general" class="nav-item active" data-tab="general">
+              <i class="fas fa-store-alt"></i>
+              <span>General Information</span>
+            </a>
+            <a href="#address" class="nav-item" data-tab="address">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Address Details</span>
+            </a>
+            <a href="#categories" class="nav-item" data-tab="categories">
+              <i class="fas fa-tags"></i>
+              <span>Categories</span>
+            </a>
+            <a href="#hours" class="nav-item" data-tab="hours">
+              <i class="fas fa-clock"></i>
+              <span>Operating Hours</span>
+            </a>
+            <a href="#delivery" class="nav-item" data-tab="delivery">
+              <i class="fas fa-truck"></i>
+              <span>Delivery Settings</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="settings-content">
+          <form id="shopSettingsForm">
+            <div class="settings-tab active" id="general-tab">
+              <div class="tab-header">
+                <h2>General Information</h2>
+                <p>Basic details about your shop</p>
+              </div>
+
+              <div class="form-group">
+                <label for="shopName">Shop Name *</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-store"></i>
+                  <input
+                    type="text"
+                    id="shopName"
+                    placeholder="e.g., Shah Foods"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="shopDescription">Shop Description *</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-align-left"></i>
+                  <textarea
+                    id="shopDescription"
+                    rows="4"
+                    placeholder="Describe your shop and what makes it special..."
+                    required
+                  ></textarea>
+                </div>
+                <div class="char-counter">
+                  <span id="descCharCount">0</span>/500
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="contactPhone">Contact Phone *</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-phone"></i>
+                  <input
+                    type="tel"
+                    id="contactPhone"
+                    placeholder="+92 300 1234567"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="contactEmail">Contact Email *</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-envelope"></i>
+                  <input
+                    type="email"
+                    id="contactEmail"
+                    placeholder="shop@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="vendorEmail">Vendor Email</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-user-tie"></i>
+                  <input
+                    type="email"
+                    id="vendorEmail"
+                    placeholder="vendor@example.com"
+                    readonly
+                  />
+                </div>
+                <small
+                  >This is your registered email and cannot be changed</small
+                >
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Shop Logo</label>
+                  <div class="image-upload-area" id="logoUploadArea">
+                    <div class="upload-placeholder" id="logoPlaceholder">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <p>Click to upload logo</p>
+                      <small>Recommended: 500x500px</small>
+                    </div>
+                    <div
+                      class="image-preview"
+                      id="logoPreview"
+                      style="display: none"
+                    >
+                      <img id="logoImage" src="" alt="Logo Preview" />
+                      <button
+                        type="button"
+                        class="remove-image"
+                        id="removeLogo"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <input type="file" id="shopLogo" accept="image/*" hidden />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Shop Cover Image</label>
+                  <div class="image-upload-area" id="coverUploadArea">
+                    <div class="upload-placeholder" id="coverPlaceholder">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                      <p>Click to upload cover</p>
+                      <small>Recommended: 1200x300px</small>
+                    </div>
+                    <div
+                      class="image-preview"
+                      id="coverPreview"
+                      style="display: none"
+                    >
+                      <img id="coverImage" src="" alt="Cover Preview" />
+                      <button
+                        type="button"
+                        class="remove-image"
+                        id="removeCover"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <input type="file" id="shopCover" accept="image/*" hidden />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-tab" id="address-tab">
+              <div class="tab-header">
+                <h2>Address Details</h2>
+                <p>Your shop location information</p>
+              </div>
+
+              <div class="form-group">
+                <label for="addressFull">Full Address *</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <input
+                    type="text"
+                    id="addressFull"
+                    placeholder="Street address, building, area"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="addressCity">City *</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-city"></i>
+                    <input
+                      type="text"
+                      id="addressCity"
+                      placeholder="e.g., Karachi"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="addressArea">Area/Locality *</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-map-pin"></i>
+                    <input
+                      type="text"
+                      id="addressArea"
+                      placeholder="e.g., DHA Phase 5"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-tab" id="categories-tab">
+              <div class="tab-header">
+                <h2>Categories</h2>
+                <p>Manage your product categories</p>
+              </div>
+
+              <div class="suggested-categories">
+                <h3>Suggested Categories</h3>
+                <div class="category-buttons">
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Burgers"
+                  >
+                    🍔 Burgers
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Pizza"
+                  >
+                    🍕 Pizza
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="BBQ"
+                  >
+                    🍖 BBQ
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Chinese"
+                  >
+                    🥡 Chinese
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Drinks"
+                  >
+                    🥤 Drinks
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Desserts"
+                  >
+                    🍰 Desserts
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Biryani"
+                  >
+                    🍛 Biryani
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Breakfast"
+                  >
+                    🍳 Breakfast
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Seafood"
+                  >
+                    🦐 Seafood
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Fast Food"
+                  >
+                    🍟 Fast Food
+                  </button>
+                  <button
+                    type="button"
+                    class="suggested-category"
+                    data-category="Rice"
+                  >
+                    🍚 Rice
+                  </button>
+                </div>
+              </div>
+
+              <div class="custom-category">
+                <h3>Add Custom Category</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <input
+                      type="text"
+                      id="newCategory"
+                      placeholder="Enter category name"
+                    />
+                  </div>
+                  <button type="button" class="btn-add" id="addCategoryBtn">
+                    <i class="fas fa-plus"></i>
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              <div class="selected-categories">
+                <h3>Selected Categories</h3>
+                <div class="categories-list" id="categoriesList"></div>
+                <small class="text-muted"
+                  >* Categories help customers find your products</small
+                >
+              </div>
+            </div>
+
+            <div class="settings-tab" id="hours-tab">
+              <div class="tab-header">
+                <h2>Operating Hours</h2>
+                <p>Set your business hours</p>
+              </div>
+
+              <div class="hours-section">
+                <h3>Monday - Friday</h3>
+                <div class="hours-row">
+                  <div class="time-input">
+                    <label>Open</label>
+                    <input type="time" id="monFriOpen" value="09:00" />
+                  </div>
+                  <div class="time-input">
+                    <label>Close</label>
+                    <input type="time" id="monFriClose" value="23:00" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="hours-section">
+                <h3>Saturday</h3>
+                <div class="hours-row">
+                  <div class="time-input">
+                    <label>Open</label>
+                    <input type="time" id="satOpen" value="10:00" />
+                  </div>
+                  <div class="time-input">
+                    <label>Close</label>
+                    <input type="time" id="satClose" value="22:00" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="hours-section">
+                <h3>Sunday</h3>
+                <div class="hours-row">
+                  <div class="time-input">
+                    <label>Open</label>
+                    <input type="time" id="sunOpen" value="11:00" />
+                  </div>
+                  <div class="time-input">
+                    <label>Close</label>
+                    <input type="time" id="sunClose" value="21:00" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-tab" id="delivery-tab">
+              <div class="tab-header">
+                <h2>Delivery Settings</h2>
+                <p>Configure your delivery options</p>
+              </div>
+
+              <div class="form-group toggle-group">
+                <label>Delivery Available</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="deliveryAvailable" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="form-group toggle-group">
+                <label>Pickup Available</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="pickupAvailable" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="form-group" id="deliveryFeeGroup">
+                <label for="deliveryFee">Delivery Fee (PKR)</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-money-bill-wave"></i>
+                  <input
+                    type="number"
+                    id="deliveryFee"
+                    placeholder="e.g., 200"
+                    min="0"
+                    value="200"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="minOrderAmount">Minimum Order Amount (PKR)</label>
+                <div class="input-wrapper">
+                  <i class="fas fa-coins"></i>
+                  <input
+                    type="number"
+                    id="minOrderAmount"
+                    placeholder="e.g., 500"
+                    min="0"
+                    value="500"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="estimatedDeliveryTime"
+                  >Estimated Delivery Time</label
+                >
+                <div class="input-wrapper">
+                  <i class="fas fa-hourglass-half"></i>
+                  <input
+                    type="text"
+                    id="estimatedDeliveryTime"
+                    placeholder="e.g., 30-45 min"
+                    value="30-45 min"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group terms-group">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="termsAgreement" required />
+                  <span class="checkmark"></span>
+                  I agree to the
+                  <a href="#" target="_blank">Terms of Service</a> and confirm
+                  that all information provided is accurate
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-cancel"
+                onclick="window.location.href = '/vendor'"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn-save" id="submitBtn">
+                <span>Save Settings</span>
+                <i class="fas fa-save"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="successModal">
+      <div class="modal-content">
+        <div class="modal-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Shop Updated Successfully!</h2>
+        <p>Your shop settings have been saved. Redirecting to dashboard...</p>
+        <div class="modal-spinner"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script
+      type="module"
+      src="/Front-End/Vendor Dashboard/shop-setting.js"
+    ></script>
+  </body>
+</html>

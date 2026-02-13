@@ -47,6 +47,14 @@
         {
             "source": "/vendor",
             "destination": "/Front-End/Vendor Dashboard/vendor.html"
+        },
+        {
+            "source": "/vendor/shop-setting",
+            "destination": "/Front-End/Vendor Dashboard/shop-setting.html"
+        },
+        {
+            "source": "/vendor/shop-setup",
+            "destination": "/Front-End/Vendor Dashboard/shop-setup.html"
         }
     ]
 }
