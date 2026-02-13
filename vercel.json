@@ -43,6 +43,10 @@
         {
             "source": "/shop-setup",
             "destination": "/Front-End/Vendor Dashboard/shop-setup.html"
+        },
+        {
+            "source": "/vendor",
+            "destination": "/Front-End/Vendor Dashboard/vendor.html"
         }
     ]
 }
