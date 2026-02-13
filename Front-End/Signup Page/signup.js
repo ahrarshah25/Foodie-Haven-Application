@@ -10,7 +10,7 @@ import {
   updateDoc,
   updateProfile,
   serverTimestamp,
-  githubProvider
+  githubProvider,
 } from "../Firebase/config.js";
 
 import notyf from "../Notyf/notyf.js";
@@ -20,9 +20,9 @@ import showLoading from "../Notyf/loader.js";
 import approveSignup from "../api/Signup-Email/approveRequest.api.js";
 import checkUser from "../utils/checkUser.js";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   checkUser();
-})
+});
 
 const togglePassword = document.getElementById("togglePassword");
 togglePassword.addEventListener("click", function () {
@@ -118,7 +118,7 @@ const userSignup = async () => {
     return;
   }
 
-  const fullName = firstName.value + " " + lastName.value || "" ;
+  const fullName = firstName.value + " " + lastName.value || "";
   const role = localStorage.getItem("role");
 
   try {
@@ -141,32 +141,43 @@ const userSignup = async () => {
       displayName: fullName,
     });
 
-    if(role === "vendor") {
-      const res = await approveSignup(email.value, fullName);
-
-    if(res.data.success === false){
-      notyf.dismiss(loading);
-      notyf.error("Faild To Send Approve Request.");
-      return;
-    }
-    }
-
-    if (role === "user") {
+    if (role === "users") {
       await updateDoc(doc(db, "users", user.user.uid), {
         isVerified: true,
       });
+    }
+
+    if (role === "vendor") {
+      const res = await approveSignup(email.value, fullName);
+
+      if (res.data.success === false) {
+        notyf.dismiss(loading);
+        notyf.error("Faild To Send Approve Request.");
+        return;
+      }
+    }
+
+    if (role === "user") {
       notyf.dismiss(loading);
       notyf.success("Account Created Successfully!");
       setTimeout(() => {
-      window.location.href = "/login";
-      },1500)
-    } else {
+        window.location.href = "/login";
+      }, 1500);
+    }
+
+    if (role === "vendor") {
       notyf.dismiss(loading);
 
       notyf.success("Account Created Successfully!\nWait For Admin Approval.");
       setTimeout(() => {
-      window.location.href = "/login";
-      },1500)
+        window.location.href = "/login";
+      }, 1500);
+    } else {
+      notyf.dismiss(loading);
+      notyf.success("Account Created Successfully!");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
     }
   } catch (error) {
     notyf.dismiss(loading);
@@ -182,50 +193,55 @@ const userSignup = async () => {
 
 const googleLogin = async () => {
   try {
-    const role = localStorage.getItem("role")
+    const role = localStorage.getItem("role");
     var loading = showLoading(notyf, "Creating Account...");
 
     const response = await signInWithPopup(auth, googleProvider);
     const userRef = doc(db, "users", response.user.uid);
     const snap = await getDoc(userRef);
 
-    if(!snap.exists()) {
+    if (!snap.exists()) {
       setDoc(userRef, {
         userName: response.user.displayName,
         userEmail: response.user.email,
         isVerified: false,
         userRole: role || "user",
         createdAt: serverTimestamp(),
-      });  
+      });
     }
 
-    if(role === "vendor") {
-      const res = await approveSignup(response.user.email, response.user.displayName);
-
-    if(res.data.success === false){
-      notyf.dismiss(loading);
-      notyf.error("Faild To Send Approve Request.");
-      return;
-    }
-    }
-    
-
-    if (role === "user") {
-      await updateDoc(doc(db, "users", user.user.uid), {
+    if (role === "users") {
+      await updateDoc(doc(db, "users", response.user.uid), {
         isVerified: true,
       });
+    }
+
+    if (role === "vendor") {
+      const res = await approveSignup(
+        response.user.email,
+        response.user.displayName,
+      );
+
+      if (res.data.success === false) {
+        notyf.dismiss(loading);
+        notyf.error("Faild To Send Approve Request.");
+        return;
+      }
+    }
+
+    if (role === "user") {
       notyf.dismiss(loading);
       notyf.success("Account Created Successfully!");
       setTimeout(() => {
-      window.location.href = "/login";
-      },1500)
+        window.location.href = "/login";
+      }, 1500);
     } else {
       notyf.dismiss(loading);
 
       notyf.success("Account Created Successfully!\nWait For Admin Approval.");
       setTimeout(() => {
-      window.location.href = "/login";
-      },1500)
+        window.location.href = "/login";
+      }, 1500);
     }
   } catch (error) {
     notyf.dismiss(loading);
@@ -235,14 +251,14 @@ const googleLogin = async () => {
 
 const githubLogin = async () => {
   try {
-    const role = localStorage.getItem("role")
+    const role = localStorage.getItem("role");
     var loading = showLoading(notyf, "Creating Account...");
 
     const response = await signInWithPopup(auth, githubProvider);
     const userRef = doc(db, "users", response.user.uid);
     const snap = await getDoc(userRef);
 
-    if(!snap.exists()) {
+    if (!snap.exists()) {
       setDoc(userRef, {
         userName: response.user.displayName,
         userEmail: response.user.email,
@@ -250,41 +266,46 @@ const githubLogin = async () => {
         userRole: role || "user",
         createdAt: serverTimestamp(),
       });
-     
     }
 
-    if(role === "vendor") {
-      const res = await approveSignup(response.user.email, response.user.displayName);
-
-    if(res.data.success === false){
-      notyf.dismiss(loading);
-      notyf.error("Faild To Send Approve Request.");
-      return;
+    if (role === "users") {
+      await updateDoc(doc(db, "users", response.user.uid), {
+        isVerified: true,
+      });
     }
+
+    if (role === "vendor") {
+      const res = await approveSignup(
+        response.user.email,
+        response.user.displayName,
+      );
+
+      if (res.data.success === false) {
+        notyf.dismiss(loading);
+        notyf.error("Faild To Send Approve Request.");
+        return;
+      }
     }
 
     if (role === "user") {
-      await updateDoc(doc(db, "users", user.user.uid), {
-        isVerified: true,
-      }); 
       notyf.dismiss(loading);
       notyf.success("Account Created Successfully!");
       setTimeout(() => {
-      window.location.href = "/login";
-      },1500)
+        window.location.href = "/login";
+      }, 1500);
     } else {
       notyf.dismiss(loading);
 
       notyf.success("Account Created Successfully!\nWait For Admin Approval.");
       setTimeout(() => {
-      window.location.href = "/login";
-      },1500)
+        window.location.href = "/login";
+      }, 1500);
     }
   } catch (error) {
     notyf.dismiss(loading);
     notyf.error(error.message);
   }
-}
+};
 
 const submitBtn = document.getElementById("submitBtn");
 
@@ -303,14 +324,14 @@ submitBtn.addEventListener("click", (e) => {
 
 const googleBtn = document.getElementById("googleBtn");
 
-googleBtn.addEventListener('click', (e) => {
+googleBtn.addEventListener("click", (e) => {
   e.preventDefault();
   googleLogin();
 });
 
 const githubBtn = document.getElementById("githubBtn");
 
-githubBtn.addEventListener('click' , (e) => {
+githubBtn.addEventListener("click", (e) => {
   e.preventDefault();
   githubLogin();
 });

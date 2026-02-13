@@ -21,8 +21,18 @@ import { getFirestore,
   getDoc,
   collection,
   getDocs,
-  updateDoc
+  updateDoc,
+  limit,
+  deleteDoc,
+  onSnapshot,
+  query, 
+    where, 
+    orderBy,
+    addDoc,
  } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+ import { getStorage } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-storage.js";
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -44,8 +54,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
-
 const githubProvider = new GithubAuthProvider();
+const storage = getStorage(app);
 
 export {
   auth,
@@ -68,5 +78,13 @@ export {
   getDocs,
   updateDoc,
   confirmPasswordReset,
-  verifyPasswordResetCode
+  verifyPasswordResetCode,
+  limit,
+  deleteDoc,
+  onSnapshot,
+  query, 
+    where, 
+    orderBy,
+    addDoc,
+    storage
 };

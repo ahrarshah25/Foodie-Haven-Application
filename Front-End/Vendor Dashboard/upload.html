@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Product | Foodie Haven</title>
+    <link rel="stylesheet" href="/Front-End/Vendor Dashboard/upload.css" />
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <link rel="stylesheet" href="/Front-End/Notyf/notyf.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="upload-container">
+      <div class="upload-background"></div>
+
+      <div class="upload-content">
+        <div class="upload-header">
+          <a href="/vendor" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+          </a>
+          <div class="upload-logo">
+            <span class="logo-icon">🍴</span>
+            <span class="logo-text">Foodie Haven</span>
+          </div>
+          <h1>Add New Product</h1>
+          <p>Fill in the details below to add a new item to your menu</p>
+        </div>
+
+        <div class="upload-card">
+          <form id="productForm" enctype="multipart/form-data">
+            <div class="form-grid">
+              <div class="form-section">
+                <h2>Basic Information</h2>
+
+                <div class="form-group">
+                  <label for="productName">Product Name *</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-tag"></i>
+                    <input
+                      type="text"
+                      id="productName"
+                      placeholder="e.g., Chicken Biryani"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="description">Description *</label>
+                  <div class="input-wrapper">
+                    <i class="fas fa-align-left"></i>
+                    <textarea
+                      id="description"
+                      placeholder="Describe your product..."
+                      rows="4"
+                      required
+                    ></textarea>
+                  </div>
+                  <small class="char-counter"
+                    ><span id="descCharCount">0</span>/500</small
+                  >
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="price">Price (PKR) *</label>
+                    <div class="input-wrapper">
+                      <i class="fas fa-rupee-sign"></i>
+                      <input
+                        type="number"
+                        id="price"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="discountPrice">Discount Price (Optional)</label>
+                    <div class="input-wrapper">
+                      <i class="fas fa-percentage"></i>
+                      <input
+                        type="number"
+                        id="discountPrice"
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="category">Category *</label>
+                    <div class="input-wrapper">
+                      <i class="fas fa-folder"></i>
+                      <select id="category" required>
+                        <option value="" disabled selected>
+                          Select a category
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="stock">Stock Quantity *</label>
+                    <div class="input-wrapper">
+                      <i class="fas fa-boxes"></i>
+                      <input
+                        type="number"
+                        id="stock"
+                        placeholder="Available units"
+                        min="0"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="preparationTime"
+                    >Preparation Time (minutes) *</label
+                  >
+                  <div class="input-wrapper">
+                    <i class="fas fa-clock"></i>
+                    <input
+                      type="number"
+                      id="preparationTime"
+                      placeholder="e.g., 30"
+                      min="0"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Product Tags</label>
+                  <div class="tags-input">
+                    <input
+                      type="text"
+                      id="tagInput"
+                      placeholder="Add tags and press Enter"
+                    />
+                    <div class="tags-container" id="tagsContainer"></div>
+                  </div>
+                  <small>e.g., spicy, vegetarian, popular</small>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h2>Media & Additional Info</h2>
+
+                <div class="form-group">
+                  <label>Product Images *</label>
+                  <div class="image-upload-area" id="imageUploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Drag & Drop Images Here</h3>
+                    <p>Supported formats: JPG, PNG, WebP, GIF</p>
+                    <p style="margin-top: 8px">or</p>
+                    <button type="button" class="browse-btn" id="browseBtn">
+                      Browse Files
+                    </button>
+                    <input
+                      type="file"
+                      id="imageInput"
+                      accept="image/*"
+                      multiple
+                      hidden
+                    />
+                  </div>
+
+                  <div class="image-preview-grid" id="imagePreviewGrid"></div>
+
+                  <div class="video-upload">
+                    <label for="videoFile">Product Video (Optional)</label>
+                    <div class="video-upload-area">
+                      <input type="file" id="videoFile" accept="video/*" />
+                      <i class="fas fa-video"></i>
+                      <span>Click to upload a demo video</span>
+                      <small>MP4, WebM, MOV up to 50MB</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Dietary Information</label>
+                  <div class="dietary-tags">
+                    <label class="dietary-checkbox">
+                      <input type="checkbox" id="vegetarian" />
+                      <span class="checkmark"></span>
+                      <i class="fas fa-leaf"></i> Vegetarian
+                    </label>
+                    <label class="dietary-checkbox">
+                      <input type="checkbox" id="vegan" />
+                      <span class="checkmark"></span>
+                      <i class="fas fa-seedling"></i> Vegan
+                    </label>
+                    <label class="dietary-checkbox">
+                      <input type="checkbox" id="glutenFree" />
+                      <span class="checkmark"></span>
+                      <i class="fas fa-wheat-alt"></i> Gluten Free
+                    </label>
+                    <label class="dietary-checkbox">
+                      <input type="checkbox" id="spicy" />
+                      <span class="checkmark"></span>
+                      <i class="fas fa-pepper-hot"></i> Spicy
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Nutritional Information (per serving)</label>
+                  <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                      <label>Calories</label>
+                      <input type="number" id="calories" placeholder="kcal" />
+                    </div>
+                    <div class="nutrition-item">
+                      <label>Protein</label>
+                      <input type="number" id="protein" placeholder="g" />
+                    </div>
+                    <div class="nutrition-item">
+                      <label>Carbs</label>
+                      <input type="number" id="carbs" placeholder="g" />
+                    </div>
+                    <div class="nutrition-item">
+                      <label>Fat</label>
+                      <input type="number" id="fat" placeholder="g" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Add-ons / Variations</label>
+                  <div id="variationsContainer">
+                    <div class="variation-row">
+                      <input
+                        type="text"
+                        placeholder="e.g., Extra Cheese"
+                        class="variation-name"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        class="variation-price"
+                        step="0.01"
+                      />
+                      <button type="button" class="remove-variation">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="add-variation-btn"
+                    id="addVariationBtn"
+                  >
+                    <i class="fas fa-plus"></i> Add Variation
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <div class="form-group" style="margin-bottom: 0">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="isAvailable" checked />
+                  <span class="checkmark"></span>
+                  This product is available for ordering
+                </label>
+              </div>
+
+              <div class="action-buttons">
+                <button
+                  type="button"
+                  class="btn-cancel"
+                  onclick="window.location.href = 'vendor'"
+                >
+                  Cancel
+                </button>
+                <button type="submit" class="btn-submit" id="submitProductBtn">
+                  <span>Upload Product</span>
+                  <i class="fas fa-cloud-upload-alt"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="uploadProgressModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Uploading Product</h3>
+        </div>
+        <div class="modal-body">
+          <div class="upload-progress">
+            <div class="progress-item">
+              <span>Images Uploading...</span>
+              <div class="progress-bar">
+                <div class="progress-fill" id="imageProgressBar"></div>
+              </div>
+              <span id="imageProgressText">0%</span>
+            </div>
+            <div class="progress-item">
+              <span>Saving to database...</span>
+              <div class="progress-bar">
+                <div class="progress-fill" id="dbProgressBar"></div>
+              </div>
+              <span id="dbProgressText">Pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="module" src="/Front-End/Vendor Dashboard/upload.js"></script>
+</html>

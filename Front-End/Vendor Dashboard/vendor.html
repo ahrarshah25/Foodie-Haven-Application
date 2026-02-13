@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vendor Dashboard | Foodie Haven</title>
+    <link rel="stylesheet" href="/Front-End/Vendor Dashboard/vendor.css" />
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<link rel="stylesheet" href="/Front-End/Notyf/notyf.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="vendor-container">
+      <aside class="vendor-sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <span class="logo-icon">🍴</span>
+            <span class="logo-text">Foodie Haven</span>
+          </div>
+          <button class="close-sidebar">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="vendor-profile">
+          <div class="profile-image" id="shopProfileImage">
+            <i class="fas fa-store"></i>
+          </div>
+          <div class="profile-info">
+            <h3 id="shopName">Loading...</h3>
+            <p class="shop-status">
+              <span class="status-badge" id="shopStatusBadge">
+                <i class="fas fa-clock"></i> Loading...
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="#dashboard" class="nav-item active" data-page="dashboard">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#orders" class="nav-item" data-page="orders">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Orders</span>
+            <span class="nav-badge" id="pendingOrdersNavBadge">0</span>
+          </a>
+          <a href="#products" class="nav-item" data-page="products">
+            <i class="fas fa-utensils"></i>
+            <span>Products</span>
+          </a>
+          <a href="/upload" class="nav-item">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Add Product</span>
+          </a>
+          <a href="#categories" class="nav-item" data-page="categories">
+            <i class="fas fa-tags"></i>
+            <span>Categories</span>
+          </a>
+          <a href="#settings" class="nav-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Shop Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="/" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Back to Site</span>
+          </a>
+          <button class="logout-btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="vendor-main">
+        <header class="vendor-header">
+          <button class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="header-search">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="globalSearch"
+              placeholder="Search orders, products..."
+            />
+          </div>
+
+          <div class="header-actions">
+            <div class="theme-toggle">
+              <input type="checkbox" id="theme-switch" class="theme-checkbox" />
+              <label for="theme-switch" class="theme-label">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+                <span class="theme-ball"></span>
+              </label>
+            </div>
+            <div class="notification-bell" id="notificationBell">
+              <i class="fas fa-bell"></i>
+              <span class="notification-dot" id="notificationDot"></span>
+            </div>
+            <div class="vendor-avatar">
+              <i class="fas fa-user-circle"></i>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content" id="dashboardContent">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading dashboard...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="proofModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Payment Proof</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <img id="proofImage" src="" alt="Payment Proof" />
+        </div>
+      </div>
+    </div>
+
+    <div id="orderModal" class="modal">
+      <div class="modal-content large">
+        <div class="modal-header">
+          <h3>Order Details</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="orderModalBody">
+          
+        </div>
+      </div>
+    </div>
+
+    <div id="categoryModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Add New Category</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="addCategoryForm">
+            <div class="form-group">
+              <label for="categoryName">Category Name</label>
+              <input
+                type="text"
+                id="categoryName"
+                placeholder="e.g., Desserts, Fast Food"
+                required
+              />
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Add Category</button>
+              <button type="button" class="btn-secondary close-modal">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="module" src="/Front-End/Vendor Dashboard/vendor.js"></script>
+</html>

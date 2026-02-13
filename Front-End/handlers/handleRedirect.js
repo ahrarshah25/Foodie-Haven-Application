@@ -13,7 +13,7 @@ const handleRedirect = async (userId, loading) => {
 
     const data = snap.data();
 
-    if(!data.isVerified) {        
+    if(data.isVerified === false && data.userRole === "vendor") {        
         notyf.dismiss(loading)
         notyf.error("Not Verified Yet!");
         return;

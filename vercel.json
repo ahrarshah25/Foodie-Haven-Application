@@ -35,6 +35,14 @@
         {
             "source": "/account-type",
             "destination": "/Front-End/Choose Account Type/acc-type.html"
+        },
+        {
+            "source": "/upload",
+            "destination": "/Front-End/Vendor Dashboard/upload.html"
+        },
+        {
+            "source": "/shop-setup",
+            "destination": "/Front-End/Vendor Dashboard/shop-setup.html"
         }
     ]
 }
