@@ -148,7 +148,7 @@ function renderProducts() {
     card.addEventListener("click", (e) => {
       if (!e.target.closest(".add-to-cart-btn")) {
         const productId = card.dataset.productId;
-        window.location.href = `/product.html?id=${productId}`;
+        window.location.href = `/product?id=${productId}`;
       }
     });
   });

@@ -67,6 +67,6 @@
         {
             "source": "/product",
             "destination": "/Front-End/Product Page/product.html"
-        },
+        }
     ]
 }
