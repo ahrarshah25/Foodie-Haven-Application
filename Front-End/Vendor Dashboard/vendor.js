@@ -170,7 +170,7 @@ async function loadDashboardData() {
       orders.length,
       pendingCount,
       completedCount,
-      products.length,
+      products.length
     );
 
     updatePendingBadges(pendingCount);
@@ -187,16 +187,16 @@ function updateStats(revenue, totalOrders, pending, completed, totalProducts) {
   if (totalRevenueEl) {
     totalRevenueEl.textContent = `PKR ${revenue.toLocaleString()}`;
   }
-
+  
   const totalOrdersEl = document.getElementById("totalOrders");
   if (totalOrdersEl) totalOrdersEl.textContent = totalOrders;
-
+  
   const pendingOrdersEl = document.getElementById("pendingOrders");
   if (pendingOrdersEl) pendingOrdersEl.textContent = pending;
-
+  
   const completedOrdersEl = document.getElementById("completedOrders");
   if (completedOrdersEl) completedOrdersEl.textContent = completed;
-
+  
   const totalProductsEl = document.getElementById("totalProducts");
   if (totalProductsEl) totalProductsEl.textContent = totalProducts;
 
@@ -992,8 +992,7 @@ window.viewOrderDetails = async (orderId) => {
     const modalBody = document.getElementById("orderModalBody");
 
     // Filter items for this shop
-    const shopItems =
-      order.items?.filter((item) => item.shopId === shopId) || [];
+    const shopItems = order.items?.filter(item => item.shopId === shopId) || [];
 
     let itemsHtml = "";
     if (shopItems.length > 0) {
@@ -1045,7 +1044,7 @@ window.viewOrderDetails = async (orderId) => {
                 <div style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: var(--light-gray); border-radius: 12px;">
                     <div style="display: flex; justify-content: space-between;">
                         <span>Subtotal (Your Items):</span>
-                        <span>PKR ${shopItems.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0).toLocaleString()}</span>
+                        <span>PKR ${(shopItems.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0)).toLocaleString()}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; font-weight: 700; color: var(--success);">
                         <span>Total:</span>

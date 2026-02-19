@@ -55,6 +55,18 @@
         {
             "source": "/vendor/shop-setup",
             "destination": "/Front-End/Vendor Dashboard/shop-setup.html"
-        }
+        },
+        {
+            "source": "/checkout",
+            "destination": "/Front-End/Checkout Page/checkout.html"
+        },
+        {
+            "source": "shop",
+            "destination": "/Front-End/Shop Page/shop.html"
+        },
+        {
+            "source": "/product",
+            "destination": "/Front-End/Product Page/product.html"
+        },
     ]
 }
