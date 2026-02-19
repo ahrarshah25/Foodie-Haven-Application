@@ -1,4 +1,4 @@
-import { db, getDoc, doc } from "../Firebase/config.js";
+import { db, getDoc, doc, updateDoc } from "../Firebase/config.js";
 
 import notyf from "../Notyf/notyf.js";
 import loginAlert from "../api/Login-Alert/loginAlert.api.js";
@@ -17,7 +17,11 @@ const handleRedirect = async (userId, loading) => {
         notyf.dismiss(loading)
         notyf.error("Not Verified Yet!");
         return;
-    };
+    } else {
+        updateDoc(doc(db, "users", userId), {
+            isVerified: true,
+        });
+    }
 
     const res = await loginAlert(data.userEmail);
 
@@ -46,7 +50,7 @@ const handleRedirect = async (userId, loading) => {
         notyf.dismiss(loading)
         notyf.success("Welcome, " + data.userName);
         setTimeout(() => {
-      window.location.href = "/dashboard";
+      window.location.href = "/shop";
       },1500)
     };
 }

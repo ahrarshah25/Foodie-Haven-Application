@@ -72,8 +72,9 @@ const userLogin = async () => {
     return;
   }
 
+  let loading;
   try {
-    var loading = showLoading(notyf, "Authenticating Account...");
+     loading = showLoading(notyf, "Authenticating Account...");
 
     const user = await signInWithEmailAndPassword(
       auth,
