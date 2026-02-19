@@ -1,4 +1,6 @@
 import { auth, db, getDoc, doc, signOut, onAuthStateChanged } from "../Firebase/config.js";
+import notyf from "../Notyf/notyf.js";
+import emailHandler from "../helpers/emailHandler.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const themeSwitch = document.getElementById("theme-switch");
@@ -146,3 +148,21 @@ onAuthStateChanged(auth, async (user) => {
   loginBtn.onclick = () => window.location.href = "/account-type";
   signupBtn.onclick = () => window.location.href = "/account-type";
 });
+
+const subscribeEmail = async () => {
+  const email = document.getElementById("email").value;
+
+  if (!email) {
+    notyf.error("Please enter your email address.");
+    return;
+  }
+
+  if (!emailHandler(email)) {
+    notyf.error("Please enter a valid email address.");
+    return;
+  }
+  notyf.success("Thank you for subscribing!");
+}
+
+const subscribeBtn = document.getElementById("subscribeBtn");
+subscribeBtn.addEventListener("click", subscribeEmail);

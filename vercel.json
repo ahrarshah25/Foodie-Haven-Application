@@ -61,7 +61,7 @@
             "destination": "/Front-End/Checkout Page/checkout.html"
         },
         {
-            "source": "shop",
+            "source": "/shop",
             "destination": "/Front-End/Shop Page/shop.html"
         },
         {
