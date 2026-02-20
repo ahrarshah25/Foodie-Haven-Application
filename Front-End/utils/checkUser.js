@@ -26,7 +26,7 @@ const checkUser = async () => {
 
     const data = snap.data();
 
-    if(data.isVerified === false) {
+    if(data.isVerified === false && data.userRole === "vendor") {
         await signOut(auth);
         return;
     }

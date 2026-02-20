@@ -352,7 +352,6 @@ function renderDashboardView(orders, products, categories) {
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Payment</th>
-                                <th>Proof</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
@@ -403,7 +402,7 @@ function renderDashboardView(orders, products, categories) {
 
 function renderOrdersTable(orders) {
   if (orders.length === 0) {
-    return `<tr><td colspan="9" class="empty-cell">No orders found</td></tr>`;
+    return `<tr><td colspan="8" class="empty-cell">No orders found</td></tr>`;
   }
 
   return orders
@@ -428,20 +427,9 @@ function renderOrdersTable(orders) {
             </td>
             <td>
                 <span class="payment-method">
-                    <i class="fas fa-${order.paymentMethod === "jazzcash" ? "mobile-alt" : order.paymentMethod === "easypaisa" ? "mobile-alt" : "credit-card"}"></i> 
-                    ${order.paymentMethod ? order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1) : "Card"}
+                    <i class="fas fa-${order.paymentMethod === "cod" ? "money-bill-wave" : "credit-card"}"></i> 
+                    ${order.paymentMethod === "cod" ? "Cash on Delivery" : "Card"}
                 </span>
-            </td>
-            <td>
-                ${
-                  order.paymentProof
-                    ? `
-                    <button class="view-proof-btn" onclick="window.viewProof('${order.paymentProof}')">
-                        <i class="fas fa-image"></i> View
-                    </button>
-                `
-                    : "No proof"
-                }
             </td>
             <td>${
               order.createdAt
@@ -592,7 +580,6 @@ async function loadOrdersView(filter = "all") {
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Payment</th>
-                                <th>Proof</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
@@ -1036,10 +1023,22 @@ window.viewOrderDetails = async (orderId) => {
                         <strong>Shipping Address</strong>
                         <p style="margin-top: 8px;">${order.shippingAddress || "No address provided"}</p>
                         <p style="margin-top: 8px;"><strong>Delivery Time:</strong> ${order.deliveryTime || "ASAP"}</p>
+                        <p><strong>Payment:</strong> ${order.paymentMethod === "cod" ? "Cash on Delivery" : "Card"}</p>
                     </div>
                 </div>
                 
                 ${itemsHtml}
+
+                ${
+                  order.orderNotes
+                    ? `
+                <div style="padding: 16px; background: #fff8dc; border: 1px solid #ffe58f; border-radius: 12px;">
+                    <strong>Customer Notes</strong>
+                    <p style="margin-top: 8px;">${order.orderNotes}</p>
+                </div>
+                `
+                    : ""
+                }
                 
                 <div style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: var(--light-gray); border-radius: 12px;">
                     <div style="display: flex; justify-content: space-between;">

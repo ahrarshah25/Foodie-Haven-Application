@@ -23,7 +23,7 @@ import showLoading from "../Notyf/loader.js";
 
 let currentUser = null;
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let selectedPaymentMethod = "card";
+let selectedPaymentMethod = "cod";
 let selectedDeliveryTime = "asap";
 let selectedAddress = null;
 let promoApplied = false;
@@ -34,17 +34,18 @@ let shopsCache = {};
 const DELIVERY_FEE = 150;
 const SERVICE_FEE = 50;
 
-const getStableAuthUser = () =>
-  new Promise((resolve) => {
-    if (auth.currentUser) {
-      resolve(auth.currentUser);
-      return;
+const getStableAuthUser = async (maxWaitMs = 6000, intervalMs = 300) => {
+    if (auth.currentUser) return auth.currentUser;
+
+    const maxTicks = Math.ceil(maxWaitMs / intervalMs);
+
+    for (let tick = 0; tick < maxTicks; tick++) {
+        await new Promise((resolve) => setTimeout(resolve, intervalMs));
+        if (auth.currentUser) return auth.currentUser;
     }
 
-    setTimeout(() => {
-      resolve(auth.currentUser || null);
-    }, 1000);
-  });
+    return null;
+};
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -75,6 +76,7 @@ onAuthStateChanged(auth, async (user) => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
 
         if (!userDoc.exists()) {
+            notyf.dismiss(loading);
             notyf.error("User data not found");
             return;
         }
@@ -165,8 +167,10 @@ function renderAddresses() {
                 card.classList.remove('selected');
             });
             e.target.closest('.address-card').classList.add('selected');
-            const index = parseInt(e.target.value);
-            selectedAddress = userAddresses[index];
+            const selectedValue = e.target.value;
+            selectedAddress =
+                userAddresses.find((addr, idx) => String(addr.id || idx) === selectedValue) ||
+                null;
         });
     });
 }
@@ -255,11 +259,6 @@ function setupEventListeners() {
             });
             e.target.closest('.payment-card').classList.add('selected');
             selectedPaymentMethod = e.target.value;
-
-            document.getElementById('cardDetails').style.display =
-                selectedPaymentMethod === 'card' ? 'block' : 'none';
-            document.getElementById('mobileDetails').style.display =
-                (selectedPaymentMethod === 'jazzcash' || selectedPaymentMethod === 'easypaisa') ? 'block' : 'none';
         });
     });
 
@@ -276,25 +275,6 @@ function setupEventListeners() {
 
     document.getElementById('addAddressBtn').addEventListener('click', showAddAddressForm);
 
-    const cardNumber = document.getElementById('cardNumber');
-    if (cardNumber) {
-        cardNumber.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-            e.target.value = value;
-        });
-    }
-
-    const expiryDate = document.getElementById('expiryDate');
-    if (expiryDate) {
-        expiryDate.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.slice(0, 2) + '/' + value.slice(2, 4);
-            }
-            e.target.value = value;
-        });
-    }
 }
 
 function setupDatePicker() {
@@ -441,50 +421,6 @@ async function placeOrder() {
         return;
     }
 
-    if (selectedPaymentMethod === 'card') {
-        const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-        const expiry = document.getElementById('expiryDate').value;
-        const cvv = document.getElementById('cvv').value;
-        const cardName = document.getElementById('cardName').value;
-
-        if (!cardNumber || !expiry || !cvv || !cardName) {
-            notyf.error('Please fill in all card details');
-            return;
-        }
-
-        if (cardNumber.length < 16) {
-            notyf.error('Invalid card number');
-            return;
-        }
-
-        if (cvv.length < 3) {
-            notyf.error('Invalid CVV');
-            return;
-        }
-
-        const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
-        if (!expiryRegex.test(expiry)) {
-            notyf.error('Invalid expiry date format (MM/YY)');
-            return;
-        }
-    }
-
-    if (selectedPaymentMethod === 'jazzcash' || selectedPaymentMethod === 'easypaisa') {
-        const mobileNumber = document.getElementById('mobileNumber').value.replace(/\s/g, '');
-        const accountHolder = document.getElementById('accountHolder').value;
-
-        if (!mobileNumber || !accountHolder) {
-            notyf.error('Please fill in mobile account details');
-            return;
-        }
-
-        const mobileRegex = /^03[0-9]{9}$/;
-        if (!mobileRegex.test(mobileNumber)) {
-            notyf.error('Invalid mobile number format');
-            return;
-        }
-    }
-
     const loading = showLoading(notyf, 'Processing your order...');
 
     try {
@@ -524,15 +460,23 @@ async function placeOrder() {
             customerPhone: selectedAddress.phone,
             customerEmail: currentUser.email,
             shippingAddress: `${selectedAddress.line1}, ${selectedAddress.line2}`,
+            deliveryAddress: {
+                type: selectedAddress.type || "home",
+                name: selectedAddress.name || "",
+                phone: selectedAddress.phone || "",
+                line1: selectedAddress.line1 || "",
+                line2: selectedAddress.line2 || "",
+            },
             items: orderItems,
             deliveryTime: selectedTimeSlot,
-            paymentMethod: selectedPaymentMethod,
+            paymentMethod: 'cod',
             subtotal: subtotal,
             deliveryFee: deliveryFee,
             serviceFee: serviceFee,
             discount: promoDiscount,
             total: total,
             promoCode: promoApplied ? document.getElementById('promoCode').value : null,
+            orderNotes: document.getElementById('orderNotes')?.value?.trim() || "",
             status: 'pending',
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
