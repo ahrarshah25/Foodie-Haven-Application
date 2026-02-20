@@ -54,7 +54,7 @@ const checkUser = async () => {
         notyf.dismiss(loading)
         notyf.success("Welcome, " + data.userName);
         setTimeout(() => {
-      window.location.href = "/dashboard";
+      window.location.href = "/shop";
       },1500)
     };
 

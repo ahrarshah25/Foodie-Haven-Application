@@ -546,7 +546,7 @@ async function submitShop(e) {
       estimatedDeliveryTime:
         document.getElementById("estimatedDeliveryTime").value.trim() ||
         "30-45 min",
-      isActive: currentShop?.isActive || false,
+      isActive: currentShop?.isActive ?? true,
       updatedAt: serverTimestamp(),
     };
 

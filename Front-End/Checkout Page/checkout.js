@@ -20,6 +20,7 @@ import {
 } from "../Firebase/config.js";
 import notyf from "../Notyf/notyf.js";
 import showLoading from "../Notyf/loader.js";
+import orderAlert from "../api/Order-Alert/orderAlert.api.js";
 
 let currentUser = null;
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -28,6 +29,7 @@ let selectedDeliveryTime = "asap";
 let selectedAddress = null;
 let promoApplied = false;
 let promoDiscount = 0;
+let appliedPromoMeta = null;
 let userAddresses = [];
 let shopsCache = {};
 
@@ -97,22 +99,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function loadUserAddresses(userData) {
-    userAddresses = [];
-
-    if (userData.addresses && userData.addresses.length > 0) {
-        userAddresses = userData.addresses;
-    } else {
-        const defaultAddress = {
-            id: "default",
-            type: "home",
-            name: userData.fullName || "Muhammad Ahrar Shah",
-            line1: userData.address || "House 123, Street 5",
-            line2: userData.city ? `${userData.city}, ${userData.area || ""}` : "DHA Phase 6, Lahore",
-            phone: userData.phone || "+92 331 2044136",
-            isDefault: true
-        };
-        userAddresses = [defaultAddress];
-    }
+    userAddresses = Array.isArray(userData.addresses) ? userData.addresses : [];
 
     renderAddresses();
 }
@@ -134,9 +121,44 @@ async function loadShopsData() {
     }
 }
 
+const calculateSubtotal = () =>
+    cart.reduce((sum, item) => {
+        const itemTotal = (item.price || 0) * (item.quantity || 1);
+        const variationsTotal =
+            (item.selectedVariations || []).reduce((s, v) => s + (v.price || 0), 0) *
+            (item.quantity || 1);
+        return sum + itemTotal + variationsTotal;
+    }, 0);
+
+const calculateShopSubtotal = (targetShopId) =>
+    cart.reduce((sum, item) => {
+        if (item.shopId !== targetShopId) return sum;
+        const itemTotal = (item.price || 0) * (item.quantity || 1);
+        const variationsTotal =
+            (item.selectedVariations || []).reduce((s, v) => s + (v.price || 0), 0) *
+            (item.quantity || 1);
+        return sum + itemTotal + variationsTotal;
+    }, 0);
+
 function renderAddresses() {
     const addressOptions = document.getElementById("addressOptions");
+    const placeOrderBtn = document.getElementById("placeOrderBtn");
     if (!addressOptions) return;
+
+    if (!userAddresses.length) {
+        selectedAddress = null;
+        if (placeOrderBtn) {
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.innerHTML = '<span>Add Address to Continue</span><i class="fas fa-map-marker-alt"></i>';
+        }
+        addressOptions.innerHTML = `
+            <div class="empty-cart" style="text-align:left; margin:0;">
+                <strong style="display:block; margin-bottom:6px;">No saved address found</strong>
+                <p style="color: var(--text-light);">Please add a delivery address to place your order.</p>
+            </div>
+        `;
+        return;
+    }
 
     addressOptions.innerHTML = userAddresses.map((addr, index) => `
         <label class="address-card ${index === 0 ? 'selected' : ''}">
@@ -159,6 +181,10 @@ function renderAddresses() {
 
     if (userAddresses.length > 0) {
         selectedAddress = userAddresses[0];
+        if (placeOrderBtn) {
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.innerHTML = '<span>Place Order</span><i class="fas fa-arrow-right"></i>';
+        }
     }
 
     document.querySelectorAll('input[name="address"]').forEach(radio => {
@@ -211,11 +237,7 @@ function renderOrderItems() {
 }
 
 function calculateTotals() {
-    const subtotal = cart.reduce((sum, item) => {
-        const itemTotal = (item.price || 0) * (item.quantity || 1);
-        const variationsTotal = (item.selectedVariations || []).reduce((s, v) => s + (v.price || 0), 0) * (item.quantity || 1);
-        return sum + itemTotal + variationsTotal;
-    }, 0);
+    const subtotal = calculateSubtotal();
 
     const deliveryFee = selectedDeliveryTime === 'asap' ? DELIVERY_FEE : 0;
     const serviceFee = SERVICE_FEE;
@@ -291,44 +313,129 @@ function setupDatePicker() {
 }
 
 function applyPromoCode() {
+    applyPromoCodeInternal().catch((error) => {
+        console.error("Promo code apply failed:", error);
+        notyf.error("Failed to apply promo code");
+    });
+}
+
+async function applyPromoCodeInternal() {
     const promoInput = document.getElementById('promoCode');
     const code = promoInput.value.trim().toUpperCase();
 
-    const validPromos = {
-        'FOODIE10': { type: 'percent', value: 10 },
-        'WELCOME20': { type: 'percent', value: 20 },
-        'SAVE50': { type: 'fixed', value: 50 },
-        'FIRSTORDER': { type: 'fixed', value: 100 },
-        'EID50': { type: 'fixed', value: 50 },
-        'RAMADAN25': { type: 'percent', value: 25 }
-    };
-
-    if (validPromos[code]) {
-        const subtotal = cart.reduce((sum, item) => {
-            const itemTotal = (item.price || 0) * (item.quantity || 1);
-            const variationsTotal = (item.selectedVariations || []).reduce((s, v) => s + (v.price || 0), 0) * (item.quantity || 1);
-            return sum + itemTotal + variationsTotal;
-        }, 0);
-
-        const promo = validPromos[code];
-
-        if (promo.type === 'percent') {
-            promoDiscount = Math.round(subtotal * (promo.value / 100));
-        } else {
-            promoDiscount = promo.value;
-        }
-
-        promoApplied = true;
-        notyf.success(`Promo code applied! You saved PKR ${promoDiscount}`);
-
-        promoInput.disabled = true;
-        document.getElementById('applyPromo').disabled = true;
-
-        calculateTotals();
-    } else {
-        notyf.error('Invalid promo code');
+    if (!code) {
+        notyf.error("Please enter a promo code");
+        return;
     }
+
+    const subtotal = calculateSubtotal();
+    const cartShopIds = [...new Set(cart.map((item) => item.shopId).filter(Boolean))];
+
+    const promoSnap = await getDocs(
+        query(
+            collection(db, "promoCodes"),
+            where("code", "==", code),
+            limit(20),
+        ),
+    );
+
+    if (promoSnap.empty) {
+        notyf.error("Invalid promo code");
+        return;
+    }
+
+    const now = Date.now();
+    let selectedPromo = null;
+
+    promoSnap.forEach((promoDoc) => {
+        if (selectedPromo) return;
+        const promo = { id: promoDoc.id, ...promoDoc.data() };
+
+        if (promo.isActive === false) return;
+
+        if (promo.shopId && !cartShopIds.includes(promo.shopId)) return;
+
+        const startsAtMs = promo.startsAt?.toDate?.()?.getTime?.() || null;
+        const expiresAtMs = promo.expiresAt?.toDate?.()?.getTime?.() || null;
+
+        if (startsAtMs && now < startsAtMs) return;
+        if (expiresAtMs && now > expiresAtMs) return;
+
+        const usedCount = promo.usedCount || 0;
+        if (promo.usageLimit && usedCount >= promo.usageLimit) return;
+
+        const promoBaseSubtotal = promo.shopId
+            ? calculateShopSubtotal(promo.shopId)
+            : subtotal;
+
+        if (promo.minOrder && promoBaseSubtotal < promo.minOrder) return;
+
+        selectedPromo = { ...promo, promoBaseSubtotal };
+    });
+
+    if (!selectedPromo) {
+        notyf.error("Promo code is not applicable right now");
+        return;
+    }
+
+    if (selectedPromo.type === "percent") {
+        promoDiscount = Math.round((selectedPromo.promoBaseSubtotal * (selectedPromo.value || 0)) / 100);
+        if (selectedPromo.maxDiscount) {
+            promoDiscount = Math.min(promoDiscount, selectedPromo.maxDiscount);
+        }
+    } else {
+        promoDiscount = Math.min(selectedPromo.value || 0, selectedPromo.promoBaseSubtotal);
+    }
+
+    if (promoDiscount <= 0) {
+        notyf.error("Promo code is not applicable");
+        return;
+    }
+
+    promoApplied = true;
+    appliedPromoMeta = selectedPromo;
+    notyf.success(`Promo code applied! You saved PKR ${promoDiscount.toLocaleString()}`);
+
+    promoInput.disabled = true;
+    document.getElementById('applyPromo').disabled = true;
+    calculateTotals();
 }
+
+const notifyVendorsOnOrder = async (orderId, orderItems, orderData) => {
+    const shopIds = [...new Set(orderItems.map((item) => item.shopId).filter(Boolean))];
+
+    const tasks = shopIds.map(async (currentShopId) => {
+        const shop = shopsCache[currentShopId] || {};
+        const vendorEmail = shop.contactEmail || shop.vendorEmail;
+        if (!vendorEmail) return;
+
+        const vendorItems = orderItems
+            .filter((item) => item.shopId === currentShopId)
+            .map((item) => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+            }));
+
+        await orderAlert({
+            vendorEmail,
+            shopName: shop.shopName || "Foodie Haven Vendor",
+            orderId,
+            customerName: orderData.customerName,
+            customerPhone: orderData.customerPhone,
+            customerEmail: orderData.customerEmail,
+            shippingAddress: orderData.shippingAddress,
+            deliveryTime: orderData.deliveryTime,
+            paymentMethod: orderData.paymentMethod,
+            orderNotes: orderData.orderNotes || "",
+            total: orderData.total,
+            subtotal: orderData.subtotal,
+            items: vendorItems,
+        });
+    });
+
+    await Promise.allSettled(tasks);
+};
 
 function showAddAddressForm() {
     Swal.fire({
@@ -417,7 +524,7 @@ async function placeOrder() {
     }
 
     if (!selectedAddress) {
-        notyf.error('Please select a delivery address');
+        notyf.error('Please add/select a delivery address');
         return;
     }
 
@@ -442,11 +549,7 @@ async function placeOrder() {
             shopName: shopsCache[item.shopId]?.shopName || 'Foodie Haven'
         }));
 
-        const subtotal = cart.reduce((sum, item) => {
-            const itemTotal = (item.price || 0) * (item.quantity || 1);
-            const variationsTotal = (item.selectedVariations || []).reduce((s, v) => s + (v.price || 0), 0) * (item.quantity || 1);
-            return sum + itemTotal + variationsTotal;
-        }, 0);
+        const subtotal = calculateSubtotal();
 
         const deliveryFee = selectedDeliveryTime === 'asap' ? DELIVERY_FEE : 0;
         const serviceFee = SERVICE_FEE;
@@ -484,6 +587,19 @@ async function placeOrder() {
         };
 
         const orderRef = await addDoc(collection(db, 'orders'), orderData);
+
+        if (promoApplied && appliedPromoMeta?.id) {
+            updateDoc(doc(db, "promoCodes", appliedPromoMeta.id), {
+                usedCount: increment(1),
+                updatedAt: serverTimestamp(),
+            }).catch((error) => {
+                console.error("Promo usage update failed:", error);
+            });
+        }
+
+        notifyVendorsOnOrder(orderRef.id, orderItems, orderData).catch((error) => {
+            console.error("Vendor order notification failed:", error);
+        });
 
         for (const shopId of orderData.shopIds) {
             const shopRef = doc(db, 'shops', shopId);

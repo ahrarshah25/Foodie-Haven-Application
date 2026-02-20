@@ -474,7 +474,7 @@ async function submitShop(e) {
         },
       },
       categoryList: selectedCategories,
-      isActive: false,
+      isActive: true,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       totalOrders: 0,

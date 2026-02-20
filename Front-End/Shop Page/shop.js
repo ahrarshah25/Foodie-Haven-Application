@@ -304,7 +304,7 @@ function setupEventListeners() {
 
   document.getElementById("userMenu").addEventListener("click", () => {
     if (currentUser) {
-      window.location.href = "/account";
+      window.location.href = "/shop";
     } else {
       window.location.href = "/account-type";
     }

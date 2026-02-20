@@ -873,6 +873,212 @@ async function deleteCategory(categoryName) {
   }
 }
 
+async function loadPromoCodesView() {
+  if (!shopId || !currentUser) return;
+
+  const dashboardContent = document.getElementById("dashboardContent");
+  dashboardContent.innerHTML = `
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading promo codes...</p>
+    </div>
+  `;
+
+  try {
+    const promoSnap = await getDocs(
+      query(collection(db, "promoCodes"), where("vendorId", "==", currentUser.uid)),
+    );
+
+    const promos = [];
+    promoSnap.forEach((promoDoc) => {
+      const promo = { id: promoDoc.id, ...promoDoc.data() };
+      if (!promo.shopId || promo.shopId === shopId) {
+        promos.push(promo);
+      }
+    });
+
+    promos.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    dashboardContent.innerHTML = `
+      <div class="recent-orders-card">
+        <div class="card-header">
+          <div>
+            <h2>Promo Codes</h2>
+            <p>Create and manage discount codes for your shop</p>
+          </div>
+        </div>
+
+        <form id="promoForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;background:var(--light-gray);padding:16px;border-radius:12px;margin-bottom:18px;">
+          <input id="promoCodeInput" type="text" placeholder="Code (e.g. SAVE20)" required style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;" />
+          <select id="promoTypeInput" style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;">
+            <option value="percent">Percent (%)</option>
+            <option value="fixed">Fixed (PKR)</option>
+          </select>
+          <input id="promoValueInput" type="number" min="1" placeholder="Discount value" required style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;" />
+          <input id="promoMinOrderInput" type="number" min="0" placeholder="Min order (PKR)" style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;" />
+          <input id="promoMaxDiscountInput" type="number" min="0" placeholder="Max discount (for %)" style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;" />
+          <input id="promoUsageLimitInput" type="number" min="0" placeholder="Usage limit" style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;" />
+          <input id="promoExpiryInput" type="date" style="padding:10px 12px;border:1px solid var(--medium-gray);border-radius:8px;font-family:inherit;" />
+          <button type="submit" class="btn-primary" style="border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">
+            <i class="fas fa-plus"></i> Create Promo
+          </button>
+        </form>
+
+        <div class="orders-table-container">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Min Order</th>
+                <th>Usage</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${
+                promos.length
+                  ? promos
+                      .map(
+                        (promo) => `
+                    <tr>
+                      <td><strong>${promo.code || "-"}</strong></td>
+                      <td>${promo.type === "percent" ? "Percent" : "Fixed"}</td>
+                      <td>${promo.type === "percent" ? `${promo.value || 0}%` : `PKR ${(promo.value || 0).toLocaleString()}`}</td>
+                      <td>PKR ${(promo.minOrder || 0).toLocaleString()}</td>
+                      <td>${promo.usedCount || 0}${promo.usageLimit ? ` / ${promo.usageLimit}` : ""}</td>
+                      <td>${promo.expiresAt?.toDate ? promo.expiresAt.toDate().toLocaleDateString("en-PK") : "No expiry"}</td>
+                      <td>
+                        <span class="status-badge ${promo.isActive ? "completed" : "cancelled"}">
+                          ${promo.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="order-actions">
+                          <button class="action-btn view" title="Toggle Status" onclick="window.togglePromoStatus('${promo.id}', ${promo.isActive ? "true" : "false"})">
+                            <i class="fas fa-power-off"></i>
+                          </button>
+                          <button class="action-btn reject" title="Delete Promo" onclick="window.deletePromoCode('${promo.id}')">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  `,
+                      )
+                      .join("")
+                  : `<tr><td colspan="8" class="empty-cell">No promo codes created yet</td></tr>`
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    const promoForm = document.getElementById("promoForm");
+    promoForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await createPromoCode();
+    });
+  } catch (error) {
+    console.error("Error loading promo codes:", error);
+    notyf.error("Failed to load promo codes");
+  }
+}
+
+async function createPromoCode() {
+  if (!currentUser || !shopId) return;
+
+  const code = document.getElementById("promoCodeInput").value.trim().toUpperCase();
+  const type = document.getElementById("promoTypeInput").value;
+  const value = Number(document.getElementById("promoValueInput").value || 0);
+  const minOrder = Number(document.getElementById("promoMinOrderInput").value || 0);
+  const maxDiscount = Number(document.getElementById("promoMaxDiscountInput").value || 0);
+  const usageLimit = Number(document.getElementById("promoUsageLimitInput").value || 0);
+  const expiryDate = document.getElementById("promoExpiryInput").value;
+
+  if (!code || value <= 0) {
+    notyf.error("Promo code and value are required");
+    return;
+  }
+
+  try {
+    const loading = showLoading(notyf, "Creating promo code...");
+
+    const dupSnap = await getDocs(
+      query(
+        collection(db, "promoCodes"),
+        where("vendorId", "==", currentUser.uid),
+        where("code", "==", code),
+        limit(1),
+      ),
+    );
+
+    if (!dupSnap.empty) {
+      notyf.dismiss(loading);
+      notyf.error("Promo code already exists");
+      return;
+    }
+
+    await addDoc(collection(db, "promoCodes"), {
+      code,
+      type,
+      value,
+      minOrder,
+      maxDiscount: type === "percent" && maxDiscount > 0 ? maxDiscount : null,
+      usageLimit: usageLimit > 0 ? usageLimit : null,
+      usedCount: 0,
+      isActive: true,
+      vendorId: currentUser.uid,
+      shopId,
+      expiresAt: expiryDate ? new Date(expiryDate) : null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    notyf.dismiss(loading);
+    notyf.success("Promo code created");
+    loadPromoCodesView();
+  } catch (error) {
+    console.error("Error creating promo:", error);
+    notyf.error("Failed to create promo code");
+  }
+}
+
+window.togglePromoStatus = async (promoId, isActive) => {
+  try {
+    const loading = showLoading(notyf, "Updating promo status...");
+    await updateDoc(doc(db, "promoCodes", promoId), {
+      isActive: !isActive,
+      updatedAt: serverTimestamp(),
+    });
+    notyf.dismiss(loading);
+    notyf.success(`Promo ${isActive ? "deactivated" : "activated"} successfully`);
+    loadPromoCodesView();
+  } catch (error) {
+    console.error("Error updating promo status:", error);
+    notyf.error("Failed to update promo status");
+  }
+};
+
+window.deletePromoCode = async (promoId) => {
+  if (!confirm("Are you sure you want to delete this promo code?")) return;
+
+  try {
+    const loading = showLoading(notyf, "Deleting promo code...");
+    await deleteDoc(doc(db, "promoCodes", promoId));
+    notyf.dismiss(loading);
+    notyf.success("Promo code deleted");
+    loadPromoCodesView();
+  } catch (error) {
+    console.error("Error deleting promo code:", error);
+    notyf.error("Failed to delete promo code");
+  }
+};
+
 async function updateOrderStatusInternal(orderId, status) {
   try {
     const loading = showLoading(notyf, `Updating order status...`);
@@ -1149,8 +1355,10 @@ document.addEventListener("DOMContentLoaded", () => {
         loadProductsView();
       } else if (page === "categories") {
         loadCategoriesView();
+      } else if (page === "promos") {
+        loadPromoCodesView();
       } else if (page === "settings") {
-        window.location.href = "/vendor/shop-settings";
+        window.location.href = "/vendor/shop-setting";
       }
     });
   });
