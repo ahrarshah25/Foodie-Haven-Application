@@ -36,19 +36,19 @@
             </div>
 
             <nav class="sidebar-menu">
-                <a href="#" class="menu-item active">
+                <a href="#" class="menu-item active" data-section="users">
                     <i class="fas fa-users"></i>
                     <span>User Management</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" data-section="products">
                     <i class="fas fa-shopping-bag"></i>
                     <span>Product Management</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" data-section="analytics">
                     <i class="fas fa-chart-bar"></i>
                     <span>Analytics</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" data-section="settings">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
@@ -91,8 +91,8 @@
 
             <main class="dashboard-content">
                 <div class="page-header">
-                    <h1>User Management</h1>
-                    <p>Manage and verify user accounts</p>
+                    <h1 id="pageTitle">User Management</h1>
+                    <p id="pageSubtitle">Manage and verify user accounts</p>
                 </div>
 
                 <div class="stats-grid">
@@ -128,7 +128,7 @@
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>+24%</h3>
+                            <h3 id="monthlyGrowth">0%</h3>
                             <p>Monthly Growth</p>
                         </div>
                     </div>
@@ -136,7 +136,7 @@
 
                 <div class="management-card">
                     <div class="card-header">
-                        <h2>User List</h2>
+                        <h2 id="cardTitle">User List</h2>
                         <div class="card-actions">
                             <div class="filter-dropdown">
                                 <select id="filterSelect">
@@ -155,7 +155,7 @@
 
                     <div class="table-container">
                         <table class="users-table">
-                            <thead>
+                            <thead id="tableHead">
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
@@ -163,7 +163,7 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="users">
+                            <tbody id="tableBody">
                                 <tr id="loadingSpinner">
                                     <td colspan="4" class="loading-cell">
                                         <div class="spinner"></div>

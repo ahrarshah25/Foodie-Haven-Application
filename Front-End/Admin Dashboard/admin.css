@@ -661,6 +661,65 @@ body {
     font-size: 1rem;
 }
 
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+}
+
+.analytics-item {
+    background: var(--light-gray);
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+}
+
+.analytics-item h4 {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.analytics-item p {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.analytics-item small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.admin-settings-form {
+    max-width: 700px;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--medium-gray);
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.settings-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-yellow);
+    cursor: pointer;
+}
+
+body.compact-mode .users-table th,
+body.compact-mode .users-table td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
 @media (max-width: 1200px) {
     .sidebar {
         width: var(--sidebar-collapsed);
