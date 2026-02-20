@@ -7,7 +7,6 @@ import {
   doc,
   setDoc,
   getDoc,
-  updateDoc,
   updateProfile,
   serverTimestamp,
   githubProvider,
@@ -19,6 +18,46 @@ import passwordHandler from "../helpers/passwordHanler.js";
 import showLoading from "../Notyf/loader.js";
 import approveSignup from "../api/Signup-Email/approveRequest.api.js";
 import checkUser from "../utils/checkUser.js";
+
+const VENDOR_APPROVAL_WAIT_MS = 2000;
+
+const redirectToLogin = () => {
+  setTimeout(() => {
+    window.location.href = "/login";
+  }, 1500);
+};
+
+const showSignupSuccess = (role) => {
+  if (role === "vendor") {
+    notyf.success("Account Created Successfully!\nWait For Admin Approval.");
+    return;
+  }
+
+  notyf.success("Account Created Successfully!");
+};
+
+const triggerVendorApprovalRequest = async (userEmail, userName) => {
+  try {
+    const response = await Promise.race([
+      approveSignup(userEmail, userName),
+      new Promise((resolve) =>
+        setTimeout(() => resolve(null), VENDOR_APPROVAL_WAIT_MS),
+      ),
+    ]);
+
+    if (!response) {
+      notyf.success("Approval request is still processing in background.");
+      return;
+    }
+
+    if (response.data?.success === false) {
+      notyf.error("Approval request is delayed. Please contact support.");
+    }
+  } catch (error) {
+    console.error("Approve request error:", error);
+    notyf.error("Approval request is delayed. Please contact support.");
+  }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   checkUser();
@@ -142,39 +181,14 @@ const userSignup = async () => {
       displayName: fullName,
     });
 
+    notyf.dismiss(loading);
+    showSignupSuccess(role);
 
     if (role === "vendor") {
-      const res = await approveSignup(email.value, fullName);
-
-      if (res.data.success === false) {
-        notyf.dismiss(loading);
-        notyf.error("Faild To Send Approve Request.");
-        return;
-      }
+      triggerVendorApprovalRequest(email.value, fullName);
     }
 
-    if (role === "user") {
-      notyf.dismiss(loading);
-      notyf.success("Account Created Successfully!");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    }
-
-    if (role === "vendor") {
-      notyf.dismiss(loading);
-
-      notyf.success("Account Created Successfully!\nWait For Admin Approval.");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    } else {
-      notyf.dismiss(loading);
-      notyf.success("Account Created Successfully!");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    }
+    redirectToLogin();
   } catch (error) {
     notyf.dismiss(loading);
     notyf.error(error.message);
@@ -188,9 +202,10 @@ const userSignup = async () => {
 };
 
 const googleLogin = async () => {
+  let loading;
   try {
     const role = localStorage.getItem("role");
-    var loading = showLoading(notyf, "Creating Account...");
+    loading = showLoading(notyf, "Creating Account...");
 
     const response = await signInWithPopup(auth, googleProvider);
     const userRef = doc(db, "users", response.user.uid);
@@ -206,33 +221,17 @@ const googleLogin = async () => {
   });
 }
 
+    notyf.dismiss(loading);
+    showSignupSuccess(role);
+
     if (role === "vendor") {
-      const res = await approveSignup(
+      triggerVendorApprovalRequest(
         response.user.email,
         response.user.displayName,
       );
-
-      if (res.data.success === false) {
-        notyf.dismiss(loading);
-        notyf.error("Faild To Send Approve Request.");
-        return;
-      }
     }
 
-    if (role === "user") {
-      notyf.dismiss(loading);
-      notyf.success("Account Created Successfully!");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    } else {
-      notyf.dismiss(loading);
-
-      notyf.success("Account Created Successfully!\nWait For Admin Approval.");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    }
+    redirectToLogin();
   } catch (error) {
     notyf.dismiss(loading);
     notyf.error(error.message);
@@ -240,9 +239,10 @@ const googleLogin = async () => {
 };
 
 const githubLogin = async () => {
+  let loading;
   try {
     const role = localStorage.getItem("role");
-    var loading = showLoading(notyf, "Creating Account...");
+    loading = showLoading(notyf, "Creating Account...");
 
     const response = await signInWithPopup(auth, githubProvider);
     const userRef = doc(db, "users", response.user.uid);
@@ -258,34 +258,17 @@ const githubLogin = async () => {
   });
 }
 
+    notyf.dismiss(loading);
+    showSignupSuccess(role);
 
     if (role === "vendor") {
-      const res = await approveSignup(
+      triggerVendorApprovalRequest(
         response.user.email,
         response.user.displayName,
       );
-
-      if (res.data.success === false) {
-        notyf.dismiss(loading);
-        notyf.error("Faild To Send Approve Request.");
-        return;
-      }
     }
 
-    if (role === "user") {
-      notyf.dismiss(loading);
-      notyf.success("Account Created Successfully!");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    } else {
-      notyf.dismiss(loading);
-
-      notyf.success("Account Created Successfully!\nWait For Admin Approval.");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    }
+    redirectToLogin();
   } catch (error) {
     notyf.dismiss(loading);
     notyf.error(error.message);
