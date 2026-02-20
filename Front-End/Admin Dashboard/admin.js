@@ -118,7 +118,7 @@ onAuthStateChanged(auth, async (user) => {
     snap.forEach((u) => {
       const data = u.data();
 
-      if(data.userRole === "admin" || data.userEmail === "admin@foodiehaven.app" || data.userName === "Admin") {
+      if (data.userRole !== "vendor") {
         return;
       }
 
@@ -188,11 +188,6 @@ onAuthStateChanged(auth, async (user) => {
     noUsersMessage.style.display = "none";
 
     filteredUsers.forEach((user) => {
-
-      if(user.userEmail === "admin@foodiehaven.app" || user.userName === "Admin") {
-        return;
-      }
-
       const row = document.createElement("tr");
 
       const nameCell = document.createElement("td");

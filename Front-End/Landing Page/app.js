@@ -131,7 +131,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (data.userRole === "user") {
       loginBtn.textContent = "Dashboard";
-      loginBtn.onclick = () => window.location.href = "/dashboard";
+      loginBtn.onclick = () => window.location.href = "/shop";
       return;
     }
 

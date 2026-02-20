@@ -34,7 +34,23 @@ let shopsCache = {};
 const DELIVERY_FEE = 150;
 const SERVICE_FEE = 50;
 
+const getStableAuthUser = () =>
+  new Promise((resolve) => {
+    if (auth.currentUser) {
+      resolve(auth.currentUser);
+      return;
+    }
+
+    setTimeout(() => {
+      resolve(auth.currentUser || null);
+    }, 1000);
+  });
+
 onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        user = await getStableAuthUser();
+    }
+
     if (!user) {
         notyf.error("Please login to checkout");
         setTimeout(() => {
